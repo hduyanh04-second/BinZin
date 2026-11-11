@@ -4,11 +4,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bin Zin</title>
+    <title>BinZin World</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/love_heart_icon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+    <script src="/_sdk/8fed440c6f94b5da.data_sdk.js" type="text/javascript"
+        integrity="sha512-hrvcCCJ6nkL5gG3mdqPDbgyAf9a/fg/zBF51sU5N3rM1WmeSu8K36+6wn9TZeAZrLIonoaPBeVyFsXxXxZjq0w=="></script>
+    <script src="/_sdk/dc9eaed14b563eb8.editing_sdk.js" type="text/javascript"
+        integrity="sha512-U1pSpFrQ86eOO8lqZ1xWYnEMHIYQODbWTwR3Q90z8aWFeEUSJieZRq+g7FYNvauPQ0rG84s3SFjWyB/NxzRXNA=="></script>
+    <script src="/_sdk/dfeb017e55db4863.resizing_sdk.js" type="text/javascript"
+        integrity="sha512-kbPBNN/FAxsctln1jqNvXyIdF7mIhQx0C+eGGC2IF3mNjNZZcftDT1wFztswSSk4KXRWYHIC3uA9NMfJV4IVUw=="></script>
 </head>
 
-<body>
-
+<body data-template-id="__page-root" class="w-full">
+    <div class="app-wrapper">
+        <header class="border-b border-white/70 bg-white/50">
+            <div class="mx-auto max-w-6xl px-5 py-4 flex flex-wrap items-center justify-between gap-3"><button
+                    type="button" data-go="home" data-template-id="brand"
+                    class="canva-button font-bold text-[#c85578]">BinZin World 💕</button>
+                <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Mở menu"
+                    aria-controls="main-nav" aria-expanded="false">
+                    <span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>
+                </button>
+                <nav id="main-nav" aria-label="Điều hướng chính" class="main-nav"><button type="button" data-go="home"
+                        data-template-id="nav-home" class="canva-button nav-btn active"
+                        aria-current="page">Home</button> <button type="button" data-go="profile"
+                        data-template-id="nav-profile" class="canva-button nav-btn">Profile</button> <button
+                        type="button" data-go="letter" data-template-id="nav-letter" class="canva-button nav-btn">Đôi
+                        lời mún nói</button> <button type="button" data-go="calendar" data-template-id="nav-calendar"
+                        class="canva-button nav-btn">Ngày mấy iu nhau 🧐</button> <button type="button" data-go="photos"
+                        data-template-id="nav-photos" class="canva-button nav-btn">Photographs</button> <button
+                        type="button" data-go="games" data-template-id="nav-games"
+                        class="canva-button nav-btn">Game</button>
+                </nav>
+            </div>
+        </header>
+        <main class="mx-auto max-w-6xl px-5 py-9 md:py-14">
+            <section id="home" class="pane reveal" aria-labelledby="home-title">
+                <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                    <div class="order-2 lg:order-1">
+                        <span data-template-id="home-eyebrow"
+                            class="canva-tag inline-block rounded-full px-4 py-2 bg-[#fbdce5] text-[#a84268] font-semibold">✦
+                            Một góc nhỏ của tụi mình</span>
+                        <h1 id="home-title" data-template-id="home-title-text"
+                            class="canva-text mt-6 leading-tight text-[#713d53]">BinZin World 💕</h1>
+                        <p data-template-id="home-description"
+                            class="canva-text mt-5 max-w-lg leading-relaxed text-[#876777]">Chào mừng đến với thế giới
+                            nhỏ xíu, nơi mỗi khoảnh khắc của Bin và Zin đều thật đáng yêu.</p>
+                        <div class="mt-8 flex flex-wrap gap-3">
+                            <button type="button" data-go="profile" data-template-id="hero-profile-button"
+                                class="canva-button primary">Gặp Bin &amp; Zin ↗</button><button type="button"
+                                data-go="calendar" data-template-id="hero-calendar-button"
+                                class="canva-button secondary">Đếm ngày iu ♡</button>
+                        </div>
+                    </div>
+                    <div class="order-1 lg:order-2 relative mx-auto w-full max-w-[470px]">
+                        <div class="absolute inset-3 rounded-[45%_45%_20px_20px] bg-[#f6c8d6] rotate-6"></div><img
+                            data-template-id="hero-couple-image" loading="lazy"
+                            class="canva-image hero-photo relative w-full shadow-2xl shadow-rose-200/60">
+                    </div>
+                </div>
+                <div class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><button type="button" data-go="profile"
+                        class="glass rounded-3xl p-6 text-left"><span aria-hidden="true">🧸</span><span
+                            data-template-id="shortcut-profile"
+                            class="canva-text block mt-3 font-bold">Profile</span></button> <button type="button"
+                        data-go="letter" class="glass rounded-3xl p-6 text-left"><span aria-hidden="true">💌</span><span
+                            data-template-id="shortcut-letter" class="canva-text block mt-3 font-bold">Đôi lời mún
+                            nói</span></button> <button type="button" data-go="photos"
+                        class="glass rounded-3xl p-6 text-left"><span aria-hidden="true">📸</span><span
+                            data-template-id="shortcut-photos" class="canva-text block mt-3 font-bold">Ảnh kỷ
+                            niệm</span></button> <button type="button" data-go="games"
+                        class="glass rounded-3xl p-6 text-left"><span aria-hidden="true">🎲</span><span
+                            data-template-id="shortcut-games" class="canva-text block mt-3 font-bold">Chơi cùng
+                            nhau</span></button>
+                </div>
+            </section>
+            <section id="profile" class="pane reveal" hidden aria-labelledby="profile-title">
+                <h1 id="profile-title" data-template-id="profile-title-text" class="canva-text text-[#713d53]">Có hai
+                    người trong thế giới này</h1>
+                <p data-template-id="profile-intro" class="canva-text mt-3 text-[#876777]">Bấm vào từng cái tên để hiểu
+                    tụi mình hơn nha.</p>
+                <div class="mt-8 flex gap-2" role="tablist" aria-label="Chọn hồ sơ">
+                    <button type="button" role="tab" id="tab-bin" aria-controls="profile-bin" aria-selected="true"
+                        data-person="bin" data-template-id="bin-tab" class="canva-button primary">Bin 🧸</button><button
+                        type="button" role="tab" id="tab-zin" aria-controls="profile-zin" aria-selected="false"
+                        data-person="zin" data-template-id="zin-tab" class="canva-button secondary">Zin 🌷</button>
+                </div>
+                <article id="profile-bin" role="tabpanel" aria-labelledby="tab-bin"
+                    class="profile-pane glass mt-7 grid md:grid-cols-[minmax(0,320px)_1fr] gap-8 rounded-[32px] p-5 md:p-8">
+                    <img data-template-id="bin-profile-photo" loading="lazy"
+                        class="canva-image w-full h-72 md:h-96 object-cover rounded-3xl">
+                    <div class="self-center">
+                        <h2 data-template-id="bin-name" class="canva-text text-[#713d53]">Bin 🧸</h2>
+                        <p data-template-id="bin-bio" class="canva-text mt-3 text-[#876777]">IT nerd của Zin, chuyên
+                            chọc Zin điên.</p>
+                        <h3 data-template-id="bin-about-label" class="canva-text mt-6 text-[#a84268]">Thông tin cơ bản
+                        </h3>
+                        <p data-template-id="bin-about" class="canva-text mt-2 whitespace-pre-line">Họ và tên: Hoàng Hải
+                            Duy Anh Sinh nhật: 31/01/2004 Gia đình: Bố Hải Anh, Mẹ Hoa, Em Châu Anh (Sâu) Công việc: IT
+                            nerd</p>
+                        <h3 data-template-id="bin-likes-label" class="canva-text mt-6 text-[#a84268]">Sở thít ♡</h3>
+                        <p data-template-id="bin-likes" class="canva-text mt-2">Keycap, mai ni cáp, chơi game, ăn và
+                            ngủ, thích chọc điên Zin.</p>
+                    </div>
+                </article>
+                <article id="profile-zin" role="tabpanel" aria-labelledby="tab-zin"
+                    class="profile-pane glass mt-7 grid md:grid-cols-[minmax(0,320px)_1fr] gap-8 rounded-[32px] p-5 md:p-8"
+                    hidden><img data-template-id="zin-profile-photo" loading="lazy"
+                        class="canva-image w-full h-72 md:h-96 object-cover rounded-3xl">
+                    <div class="self-center">
+                        <h2 data-template-id="zin-name" class="canva-text text-[#713d53]">Zin 🌷</h2>
+                        <p data-template-id="zin-bio" class="canva-text mt-3 text-[#876777]">Cô sinh viên năng động,
+                            business girl tương lai.</p>
+                        <h3 data-template-id="zin-about-label" class="canva-text mt-6 text-[#a84268]">Thông tin cơ bản
+                        </h3>
+                        <p data-template-id="zin-about" class="canva-text mt-2 whitespace-pre-line">Họ và tên: Nguyễn
+                            Mai Trang Sinh nhật: 08/09/2006 Gia đình: Bố Sơn, Mẹ Nghĩa, Chị Phương Công việc: Cô sinh
+                            viên năng động / Business girl tương lai</p>
+                        <h3 data-template-id="zin-likes-label" class="canva-text mt-6 text-[#a84268]">Sở thít ♡</h3>
+                        <p data-template-id="zin-likes" class="canva-text mt-2">Thích xanh navy, đồ cute dùng hằng ngày,
+                            pijama, thích mắng Bin và thích Bin chiều chuộng.</p>
+                    </div>
+                </article>
+            </section>
+            <section id="letter" class="pane reveal" hidden aria-labelledby="letter-title">
+                <div class="max-w-2xl mx-auto">
+                    <h1 id="letter-title" data-template-id="letter-title-text"
+                        class="canva-text text-center text-[#713d53]">Đôi lời mún nói 💌</h1>
+                    <p data-template-id="letter-intro" class="canva-text mt-3 text-center text-[#876777]">Viết thư rồi
+                        mở ứng dụng email để gửi cho Zin nha.</p>
+                    <form id="letter-form" class="glass mt-8 rounded-[32px] p-6 sm:p-9 space-y-5">
+                        <div>
+                            <label for="sender" data-template-id="sender-label"
+                                class="canva-text mb-2 block font-semibold">Tên của bạn</label><input id="sender"
+                                class="field" maxlength="80" required>
+                        </div>
+                        <div>
+                            <label for="subject" data-template-id="subject-label"
+                                class="canva-text mb-2 block font-semibold">Tiêu đề thư</label><input id="subject"
+                                class="field" maxlength="120" required>
+                        </div>
+                        <div>
+                            <label for="message" data-template-id="message-label"
+                                class="canva-text mb-2 block font-semibold">Lời nhắn</label><textarea id="message"
+                                class="field min-h-40" maxlength="3000" required></textarea>
+                        </div><button type="submit" data-template-id="send-mail-button"
+                            class="canva-button primary w-full">Mở email để gửi thư ↗</button>
+                        <p data-template-id="mail-disclosure" class="canva-text text-center text-[#876777]">Thư gửi đến
+                            Zin: nmaitrang0809@gmail.com. Bạn cần bấm Gửi trong ứng dụng email. Chưa có email của Bin
+                            nên chưa thể soạn thư gửi Bin.</p>
+                        <p id="mail-status" role="status" class="text-center text-[#a84268]"></p>
+                    </form>
+                </div>
+            </section>
+            <section id="calendar" class="pane reveal" hidden aria-labelledby="calendar-title">
+                <h1 id="calendar-title" data-template-id="calendar-title-text"
+                    class="canva-text text-center text-[#713d53]">Ngày mấy iu nhau 🧐</h1>
+                <p data-template-id="calendar-intro" class="canva-text mt-3 text-center text-[#876777]">Tụi mình bắt đầu
+                    yêu nhau từ ngày 04/07/2026 💕</p>
+                <div class="mt-8 grid md:grid-cols-2 gap-6">
+                    <div class="glass rounded-[30px] p-7"><p data-template-id="date-label"
+                            class="canva-text font-semibold">Ngày bắt đầu iu 💕</p>
+                        <!-- Ngày bắt đầu yêu được cố định: 04/07/2026 -->
+                        <input id="start-date" type="hidden" value="2026-07-04">
+                        <p class="field mt-3 font-semibold text-[#bc4f71]">04/07/2026</p>
+                        <div class="mt-8 rounded-3xl bg-[#ffe7ed] p-6 text-center">
+                            <p data-template-id="days-label" class="canva-text text-[#a84268]">Mình đã bên nhau</p>
+                            <p id="days-count" class="my-2 font-['Fraunces'] text-6xl font-bold text-[#bc4f71]"
+                                aria-live="polite">—</p>
+                            <p data-template-id="days-unit" class="canva-text text-[#a84268]">ngày yêu thương ♡</p>
+                        </div>
+                        <p id="date-status" role="status" class="mt-4 text-center"></p>
+                    </div>
+                    <div class="glass rounded-[30px] p-5 sm:p-7">
+                        <div class="flex justify-between items-center gap-3">
+                            <button id="previous-month" type="button" aria-label="Tháng trước"
+                                class="secondary">‹</button>
+                            <h2 id="month-title" class="text-center"></h2><button id="next-month" type="button"
+                                aria-label="Tháng sau" class="secondary">›</button>
+                        </div>
+                        <div class="calendar-grid mt-6 text-center text-[#a84268] font-bold" aria-hidden="true">
+                            <span>CN</span><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span>
+                        </div>
+                        <div id="calendar-days" class="calendar-grid mt-3" aria-label="Lịch tháng"></div><button
+                            id="today-button" type="button" data-template-id="today-button-text"
+                            class="canva-button secondary mt-5">Hôm nay</button>
+                    </div>
+                </div>
+            </section>
+            <section id="photos" class="pane reveal" hidden aria-labelledby="photos-title">
+                <h1 id="photos-title" data-template-id="photos-title-text" class="canva-text text-[#713d53]">We keep
+                    this love in photographs 📸</h1>
+                <p data-template-id="photos-intro" class="canva-text mt-3 text-[#876777]">Kéo thả ảnh của tụi mình vào
+                    các khung trong trình chỉnh sửa Canva. Viết chú thích để lưu vào Canva Sheet nhé.</p>
+                <div class="grid sm:grid-cols-3 gap-4 mt-8">
+                    <figure class="glass p-3 rounded-3xl">
+                        <img data-template-id="memory-photo-one" loading="lazy"
+                            class="canva-image w-full aspect-square object-cover rounded-2xl">
+                        <figcaption data-template-id="memory-caption-one" class="canva-text p-3 text-[#876777]">
+                            Tụi mình ♡
+                        </figcaption>
+                    </figure>
+                    <figure class="glass p-3 rounded-3xl">
+                        <img data-template-id="memory-photo-two" loading="lazy"
+                            class="canva-image w-full aspect-square object-cover rounded-2xl">
+                        <figcaption data-template-id="memory-caption-two" class="canva-text p-3 text-[#876777]">
+                            Zin 🌷
+                        </figcaption>
+                    </figure>
+                    <figure class="glass p-3 rounded-3xl">
+                        <img data-template-id="memory-photo-three" loading="lazy"
+                            class="canva-image w-full aspect-square object-cover rounded-2xl">
+                        <figcaption data-template-id="memory-caption-three" class="canva-text p-3 text-[#876777]">
+                            Bin 🧸
+                        </figcaption>
+                    </figure>
+                </div>
+                <div class="glass rounded-3xl p-6 mt-8">
+                    <h2 data-template-id="notes-title" class="canva-text">Sổ chú thích kỷ niệm</h2>
+                    <form id="caption-form" class="mt-4 flex flex-col sm:flex-row gap-3">
+                        <label for="caption-input" data-template-id="caption-label" class="canva-text sm:sr-only">Chú
+                            thích kỷ niệm</label><input id="caption-input" class="field flex-1" maxlength="240"
+                            required><button type="submit" data-template-id="caption-save"
+                            class="canva-button primary">Lưu kỷ niệm</button>
+                    </form>
+                    <p id="data-status" role="status" aria-live="polite" class="mt-3 text-[#a84268]">Đang tải chú thích…
+                    </p><button id="data-retry" type="button" data-template-id="data-retry-text"
+                        class="canva-button secondary mt-2" hidden>Thử lại</button>
+                    <ul id="caption-list" class="mt-4 space-y-3"></ul>
+                </div>
+            </section>
+            <section id="games" class="pane reveal" hidden aria-labelledby="games-title">
+                <h1 id="games-title" data-template-id="games-title-text" class="canva-text text-[#713d53]">Game của tụi
+                    mình 🎲</h1>
+                <p data-template-id="games-intro" class="canva-text mt-2 text-[#876777]">Chọn một trò rồi chuyền màn
+                    hình cho nhau nha!</p>
+                <div class="mt-6 flex flex-wrap gap-2" role="tablist" aria-label="Chọn trò chơi"><button type="button"
+                        data-game="who" data-template-id="game-tab-who" class="canva-button pill active" role="tab"
+                        aria-selected="true">Who am I?</button> <button type="button" data-game="age"
+                        data-template-id="game-tab-age" class="canva-button pill" role="tab" aria-selected="false">Guess
+                        the Age</button> <button type="button" data-game="code" data-template-id="game-tab-code"
+                        class="canva-button pill" role="tab" aria-selected="false">Code Breaker</button> <button
+                        type="button" data-game="xo" data-template-id="game-tab-xo" class="canva-button pill" role="tab"
+                        aria-selected="false">Tic tac toe</button> <button type="button" data-game="chess"
+                        data-template-id="game-tab-chess" class="canva-button pill" role="tab" aria-selected="false">Cờ
+                        vua</button>
+                </div>
+                <section id="game-who" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" aria-label="Who am I?">
+                    <h2 data-template-id="who-title" class="canva-text">Who am I? 🕵️</h2>
+                    <p data-template-id="who-help" class="canva-text mt-2 text-[#876777]">Mỗi người xem riêng nhân vật
+                        của mình rồi miêu tả cho người kia đoán. Che màn hình trước khi chuyền máy!</p>
+                    <div id="who-play" class="mt-6"></div><button type="button" data-restart="who"
+                        data-template-id="who-restart" class="canva-button secondary mt-5">Chơi lại / đổi nhân
+                        vật</button>
+                </section>
+                <section id="game-age" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden
+                    aria-label="Guess the Age">
+                    <h2 data-template-id="age-title" class="canva-text">Guess the Age 🎂</h2>
+                    <p data-template-id="age-help" class="canva-text mt-2 text-[#876777]">Xem riêng độ tuổi của mình,
+                        đưa gợi ý “Độ tuổi này có được…?” và để người kia đoán con số.</p>
+                    <div id="age-play" class="mt-6"></div><button type="button" data-restart="age"
+                        data-template-id="age-restart" class="canva-button secondary mt-5">Chơi lại / đổi tuổi</button>
+                </section>
+                <section id="game-code" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden
+                    aria-label="Code Breaker">
+                    <h2 data-template-id="code-title" class="canva-text">Code Breaker 🔐</h2>
+                    <p data-template-id="code-help" class="canva-text mt-2 text-[#876777]">Xem riêng mã bốn chữ số của
+                        mình. Sau mỗi lần người kia đoán, xem có bao nhiêu chữ số đúng và bao nhiêu vị trí đúng. Mã có
+                        thể bắt đầu bằng 0.</p>
+                    <div id="code-play" class="mt-6"></div><button type="button" data-restart="code"
+                        data-template-id="code-restart" class="canva-button secondary mt-5">Chơi lại / đổi mã</button>
+                </section>
+                <section id="game-xo" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden
+                    aria-label="Tic tac toe">
+                    <h2 data-template-id="xo-title" class="canva-text">Tic tac toe ⭕</h2>
+                    <p data-template-id="xo-help" class="canva-text mt-2 text-[#876777]">Bin là X, Zin là O. Thay phiên
+                        chọn ô; ai nối được năm ô liên tiếp trước sẽ thắng.</p>
+                    <p id="xo-status" class="text-center font-bold my-5" role="status"></p>
+                    <div id="xo-board" class="board" aria-label="Bàn cờ 10 nhân 10"></div><button id="xo-reset"
+                        type="button" data-template-id="xo-reset-text" class="canva-button secondary mt-5">Ván
+                        mới</button>
+                </section>
+                <section id="game-chess" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden aria-label="Cờ vua">
+                    <h2 data-template-id="chess-title" class="canva-text">Cờ vua ♟️</h2>
+                    <p data-template-id="chess-help" class="canva-text mt-2 text-[#876777]">Hai người chơi trên cùng màn
+                        hình: Bin cầm Trắng đi trước, Zin cầm Đen. Chọn quân rồi chọn ô đến. Không hỗ trợ nhập thành
+                        hoặc bắt tốt qua đường; tốt đến cuối bàn tự phong hậu.</p>
+                    <p id="chess-status" class="text-center font-bold my-5" role="status"></p>
+                    <div id="chess-board" class="chess" aria-label="Bàn cờ vua"></div><button id="chess-reset"
+                        type="button" data-template-id="chess-reset-text" class="canva-button secondary mt-5">Ván
+                        mới</button>
+                </section>
+            </section>
+        </main>
+        <footer class="px-5 py-8 text-center">
+            <p data-template-id="footer-text" class="canva-footer text-[#936c7c]">Made with ♡ for Bin &amp; Zin</p>
+        </footer>
+    </div>
+    <template id="caption-row-template">
+        <li data-template-id="caption-row"
+            class="canva-card flex justify-between items-start gap-3 rounded-2xl bg-[#fff1f4] p-4">
+            <div class="min-w-0">
+                <p data-template-id="caption-row-text" class="canva-text break-words"></p><time
+                    data-template-id="caption-row-date" class="canva-text block text-[#876777] mt-1"></time>
+            </div>
+            <div class="shrink-0">
+                <button type="button" data-template-id="caption-delete"
+                    class="canva-button secondary">Xóa</button><button type="button" data-template-id="caption-confirm"
+                    class="canva-button secondary" hidden>Xác nhận xóa?</button><button type="button"
+                    data-template-id="caption-cancel" class="canva-button secondary" hidden>Hủy</button>
+            </div>
+        </li>
+    </template>
+    <script src = "script.js"></script>
 </body>
-
 </html>
