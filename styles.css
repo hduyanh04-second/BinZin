@@ -894,6 +894,16 @@ input[type="date"].field {
 }
 
 /* ===== Thanh điều hướng ===== */
+.app-wrapper>header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(255, 246, 248, .88);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(143, 69, 91, .06)
+}
+
 .main-nav {
     display: flex;
     flex-wrap: wrap;

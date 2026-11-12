@@ -288,6 +288,10 @@ $('chess-reset').onclick = resetChess; resetChess();
     }
 
     let editingCdIdx = -1, editingMsIdx = -1;
+    const todayISO = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
 
     function setCdEditing(item) {
         if (item) {
@@ -302,7 +306,7 @@ $('chess-reset').onclick = resetChess; resetChess();
             editingCdIdx = -1;
             $('cd-icon').value = '💖';
             $('cd-title').value = '';
-            $('cd-date').value = '';
+            $('cd-date').value = todayISO();
             $('cd-submit').textContent = 'Thêm';
             $('cd-cancel').hidden = true;
         }
@@ -319,11 +323,13 @@ $('chess-reset').onclick = resetChess; resetChess();
         } else {
             editingMsIdx = -1;
             $('ms-title').value = '';
-            $('ms-date').value = '';
+            $('ms-date').value = todayISO();
             $('ms-submit').textContent = 'Thêm';
             $('ms-cancel').hidden = true;
         }
     }
+    if ($('cd-date')) $('cd-date').value = todayISO();
+    if ($('ms-date')) $('ms-date').value = todayISO();
 
     function renderMilestones() {
         if (!autoListEl) return;
