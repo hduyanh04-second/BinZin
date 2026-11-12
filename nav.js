@@ -1,7 +1,36 @@
-// ===== Dùng chung cho toàn bộ các trang: Menu điện thoại + Khóa mật khẩu + Hiệu ứng hạt bay & tim chạm =====
+// ===== Dùng chung cho toàn bộ các trang: Thanh điều hướng, tiện ích, trạng thái Firebase, khóa mật khẩu & hiệu ứng =====
+const $ = id => document.getElementById(id);
+
 (() => {
-    // 1. Menu điều hướng trên điện thoại
-    const menuToggle = document.getElementById('menu-toggle'), mainNav = document.getElementById('main-nav');
+    // 1. Tự động chuẩn hóa các liên kết trên thanh điều hướng & đánh dấu trang hiện tại
+    const NAV_ITEMS = [
+        { href: 'index.html', label: 'Home' },
+        { href: 'profile.html', label: 'Profile' },
+        { href: 'letter.html', label: 'Đôi lời mún nói' },
+        { href: 'calendar.html', label: 'Ngày mấy iu nhau 🧐' },
+        { href: 'photos.html', label: 'Photographs' },
+        { href: 'wheel.html', label: 'Hôm nay ăn gì 🎡' },
+        { href: 'games.html', label: 'Game' }
+    ];
+    const currentFile = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    const mainNav = $('main-nav'), menuToggle = $('menu-toggle');
+
+    if (mainNav) {
+        mainNav.replaceChildren();
+        NAV_ITEMS.forEach(item => {
+            const a = document.createElement('a');
+            a.href = item.href;
+            a.className = 'canva-button nav-btn';
+            a.textContent = item.label;
+            if (currentFile === item.href) {
+                a.classList.add('active');
+                a.setAttribute('aria-current', 'page');
+            }
+            mainNav.append(a);
+        });
+    }
+
+    // 2. Menu điều hướng trên điện thoại
     const setMenu = open => {
         if (!menuToggle || !mainNav) return;
         mainNav.classList.toggle('open', open);
@@ -18,12 +47,114 @@
         window.matchMedia('(min-width:768px)').addEventListener('change', e => { if (e.matches) setMenu(false) });
     }
 
-    // 2. Màn hình khóa mật khẩu (Passcode: 040726)
+    // 3. Tiện ích dùng chung (toast, xử lý ảnh, trạng thái chung trên Firebase)
+    let toastTimer;
+    const showToast = (msg, ms = 3200) => {
+        let el = $('toast');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'toast';
+            el.className = 'toast';
+            el.setAttribute('role', 'status');
+            el.setAttribute('aria-live', 'polite');
+            document.body.append(el);
+        }
+        el.textContent = msg;
+        el.hidden = false;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { el.hidden = true }, ms);
+    };
+
+    const loadImage = file => new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file), img = new Image();
+        img.onload = () => { URL.revokeObjectURL(url); resolve(img) };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không đọc được ảnh ' + file.name)) };
+        img.src = url;
+    });
+
+    const compressImage = (img, { maxSide, quality, maxChars }) => {
+        let side = maxSide, q = quality;
+        for (let i = 0; i < 12; i++) {
+            const s = Math.min(1, side / Math.max(img.naturalWidth, img.naturalHeight));
+            const w = Math.round(img.naturalWidth * s), h = Math.round(img.naturalHeight * s);
+            const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+            const data = canvas.toDataURL('image/jpeg', q);
+            if (data.length <= maxChars) return data;
+            if (q > .6) q -= .08; else side = Math.round(side * .85);
+        }
+        throw new Error('Ảnh quá lớn');
+    };
+
+    const todayISO = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+
+    const cfg = window.FIREBASE_CONFIG || {};
+    const firebaseReady = Boolean(window.firebase && cfg.apiKey && !String(cfg.apiKey).startsWith('YOUR_'));
+    if (firebaseReady && !firebase.apps.length) firebase.initializeApp(cfg);
+
+    // Quản lý document dùng chung profiles/mood (lưu Mood ở Home, Cột mốc ở Calendar, Danh sách ở Wheel)
+    const STATE_KEY = 'binzin-mood-v1';
+    const DEFAULT_STATE = {
+        binEmoji: '💭',
+        binText: 'Nhớ Zin nhiều lắm 💕',
+        zinEmoji: '🧋',
+        zinText: 'Thèm trà sữa cùng Bin',
+        countdownEvents: null,
+        customMilestones: '',
+        wheelEat: '',
+        wheelGo: ''
+    };
+
+    function subscribeAppState(onChange) {
+        let state = { ...DEFAULT_STATE };
+        try { state = { ...state, ...JSON.parse(localStorage.getItem(STATE_KEY) || '{}') } } catch { }
+        const serialize = s => JSON.stringify({
+            binEmoji: s.binEmoji, binText: s.binText, zinEmoji: s.zinEmoji, zinText: s.zinText,
+            countdownEvents: s.countdownEvents, customMilestones: s.customMilestones, wheelEat: s.wheelEat, wheelGo: s.wheelGo
+        });
+        if (firebaseReady) {
+            const ref = firebase.firestore().collection('profiles').doc('mood');
+            ref.onSnapshot(snap => {
+                if (snap.exists) {
+                    try { state = { ...state, ...JSON.parse(snap.data().about || '{}') } } catch { }
+                    localStorage.setItem(STATE_KEY, serialize(state));
+                    onChange(state);
+                }
+            }, err => console.error(err));
+            onChange(state);
+            return async patch => {
+                state = { ...state, ...patch };
+                localStorage.setItem(STATE_KEY, serialize(state));
+                onChange(state);
+                await ref.set({
+                    name: 'AppState',
+                    bio: `${state.binEmoji} ${state.binText}`.slice(0, 150),
+                    about: serialize(state).slice(0, 1490),
+                    likes: '',
+                    photo: '',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            };
+        }
+        onChange(state);
+        return async patch => {
+            state = { ...state, ...patch };
+            localStorage.setItem(STATE_KEY, serialize(state));
+            onChange(state);
+        };
+    }
+
+    window.BinZin = { toast: showToast, loadImage, compressImage, todayISO, firebaseReady, subscribeAppState };
+
+    // 4. Màn hình khóa mật khẩu (Passcode: 040726)
     const PASSCODE = '040726';
     const UNLOCK_KEY = 'binzin-unlocked-v1';
 
     function openLockScreen() {
-        if (document.getElementById('passcode-gate')) return;
+        if ($('passcode-gate')) return;
         const gate = document.createElement('div');
         gate.id = 'passcode-gate';
         gate.className = 'passcode-gate';
@@ -64,9 +195,7 @@
         const errEl = gate.querySelector('#passcode-err');
         const card = gate.querySelector('#passcode-card');
 
-        function updateDots() {
-            dots.forEach((d, i) => d.classList.toggle('filled', i < code.length));
-        }
+        const updateDots = () => dots.forEach((d, i) => d.classList.toggle('filled', i < code.length));
 
         function pushDigit(d) {
             if (code.length >= PASSCODE.length) return;
@@ -97,7 +226,7 @@
         });
 
         const onKey = e => {
-            if (!document.getElementById('passcode-gate')) { document.removeEventListener('keydown', onKey); return }
+            if (!$('passcode-gate')) { document.removeEventListener('keydown', onKey); return }
             if (e.key >= '0' && e.key <= '9') { e.preventDefault(); pushDigit(e.key) }
             else if (e.key === 'Backspace') { e.preventDefault(); code = code.slice(0, -1); updateDots() }
             else if (e.key === 'Escape') { e.preventDefault(); code = ''; updateDots() }
@@ -107,8 +236,7 @@
 
     if (localStorage.getItem(UNLOCK_KEY) !== '1') openLockScreen();
 
-    // Thêm nút khóa nhanh trên thanh điều hướng
-    if (mainNav && !mainNav.querySelector('[data-lock-btn]')) {
+    if (mainNav) {
         const lockBtn = document.createElement('button');
         lockBtn.type = 'button';
         lockBtn.dataset.lockBtn = '1';
@@ -123,7 +251,7 @@
         mainNav.append(lockBtn);
     }
 
-    // 3. Hiệu ứng hạt bay (cánh hoa / tim rơi nhẹ) & tim nảy khi bấm chuột/chạm
+    // 5. Hiệu ứng hạt bay & tim chạm
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         const petalHost = document.createElement('div');
         petalHost.className = 'petal-layer';

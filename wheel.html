@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hôm nay ăn gì / Đi đâu? 🎡 | Bin Zin</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/love_heart_icon.svg">
+    <link rel="stylesheet" href="styles.css?v=11">
+    <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+
+<body class="w-full">
+    <div class="app-wrapper min-h-screen flex flex-col">
+        <header class="border-b border-white/70 bg-white/50">
+            <div class="mx-auto max-w-6xl px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+                <a href="index.html" class="canva-button font-bold text-[#c85578]">BinZin World 💕</a>
+                <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Mở menu"
+                    aria-controls="main-nav" aria-expanded="false">
+                    <span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>
+                </button>
+                <nav id="main-nav" aria-label="Điều hướng chính" class="main-nav"></nav>
+            </div>
+        </header>
+
+        <main class="mx-auto w-full max-w-6xl px-4 sm:px-5 py-8 md:py-12 flex-1">
+            <section class="reveal" aria-labelledby="wheel-title">
+                <h1 id="wheel-title" class="text-center text-[#713d53]">Hôm nay ăn gì / Đi đâu? 🎡</h1>
+                <p class="mt-2 text-center text-[#876777]">Để vòng quay quyết định giúp Bin &amp; Zin khỏi phải đau đầu suy nghĩ nha!</p>
+                <div class="mt-6 flex justify-center gap-2" role="tablist" aria-label="Chọn loại vòng quay">
+                    <button type="button" data-wheel-tab="eat" class="pill active font-bold" role="tab" aria-selected="true">🍜 Hôm nay ăn gì?</button>
+                    <button type="button" data-wheel-tab="go" class="pill font-bold" role="tab" aria-selected="false">🛵 Hôm nay đi đâu?</button>
+                </div>
+
+                <div class="mt-8 grid lg:grid-cols-[minmax(0,420px)_1fr] gap-8 items-center">
+                    <div class="glass rounded-[32px] p-6 flex flex-col items-center">
+                        <div class="wheel-stage">
+                            <div class="wheel-pointer" aria-hidden="true">▼</div>
+                            <canvas id="wheel-canvas" width="340" height="340" class="wheel-canvas"></canvas>
+                        </div>
+                        <button type="button" id="wheel-spin" class="primary mt-6 w-full max-w-xs text-lg">🎯 Quay ngay!</button>
+                        <p id="wheel-result" role="status" aria-live="polite" class="mt-4 text-center font-bold text-xl text-[#c85578] min-h-8"></p>
+                    </div>
+
+                    <div class="glass rounded-[32px] p-6 sm:p-7">
+                        <h2 id="wheel-list-title" class="text-[#713d53]">Danh sách món ăn 🍜</h2>
+                        <form id="wheel-add-form" class="mt-4 flex gap-2">
+                            <input id="wheel-item-input" class="field flex-1" maxlength="50" placeholder="Thêm lựa chọn mới…" required>
+                            <button type="submit" class="primary">Thêm</button>
+                        </form>
+                        <ul id="wheel-items" class="mt-4 flex flex-wrap gap-2"></ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="px-5 py-8 text-center">
+            <p class="text-[#936c7c]">Made with ♡ for Bin &amp; Zin</p>
+        </footer>
+    </div>
+    <script src="nav.js?v=5"></script>
+    <script src="wheel.js?v=2"></script>
+</body>
+
+</html>
+

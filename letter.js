@@ -1,5 +1,5 @@
 // ===== Trang "Đôi lời mún nói": khung chat lưu trên Firebase Firestore =====
-const $ = id => document.getElementById(id);
+const { firebaseReady } = window.BinZin;
 const NAME_KEY = 'binzin-chat-name', LOCAL_KEY = 'binzin-chat-messages';
 const list = $('chat-list'), empty = $('chat-empty'), form = $('chat-form'), statusEl = $('chat-status');
 const titleInput = $('chat-title'), contentInput = $('chat-content');
@@ -44,12 +44,9 @@ function render(messages) {
 }
 
 // ---------- Lưu trữ ----------
-const cfg = window.FIREBASE_CONFIG || {};
-const firebaseReady = window.firebase && cfg.apiKey && !String(cfg.apiKey).startsWith('YOUR_');
 let sendMessage;
 
 if (firebaseReady) {
-    firebase.initializeApp(cfg);
     const col = firebase.firestore().collection('messages');
     statusEl.textContent = 'Đang tải lời nhắn…';
     col.orderBy('createdAt', 'asc').limit(500).onSnapshot(snap => {

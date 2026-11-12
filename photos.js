@@ -2,7 +2,7 @@
 // Ảnh được nén ngay trên trình duyệt rồi lưu thành 2 phần:
 //   photos/{id}     -> ảnh thu nhỏ + chú thích (tải nhanh cho lưới ảnh)
 //   photoData/{id}  -> ảnh lớn (~1600px), chỉ tải khi mở xem
-const $ = id => document.getElementById(id);
+const { toast, loadImage, compressImage: compress, firebaseReady } = window.BinZin;
 const NAME_KEY = 'binzin-chat-name';        // dùng chung lựa chọn Bin/Zin với trang chat
 const PAGE_SIZE = 48;
 const FULL = { maxSide: 1600, quality: .85, maxChars: 900000 };   // < 1MB / document Firestore
@@ -22,11 +22,8 @@ uploaderRadios.forEach(r => { r.checked = r.value === savedName; r.addEventListe
 const uploader = () => uploaderRadios.find(r => r.checked)?.value || '';
 
 // ---------- Firebase ----------
-const cfg = window.FIREBASE_CONFIG || {};
-const firebaseReady = window.firebase && cfg.apiKey && !String(cfg.apiKey).startsWith('YOUR_');
 let db, photosCol, dataCol;
 if (firebaseReady) {
-    firebase.initializeApp(cfg);
     db = firebase.firestore(); photosCol = db.collection('photos'); dataCol = db.collection('photoData');
     subscribe();
 } else {
@@ -87,29 +84,6 @@ fileInput.addEventListener('change', () => setFiles(fileInput.files));
 ['dragleave', 'drop'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('dragging') }));
 dropZone.addEventListener('drop', e => setFiles(e.dataTransfer.files));
 
-// ---------- Nén ảnh ----------
-function loadImage(file) {
-    return new Promise((resolve, reject) => {
-        const url = URL.createObjectURL(file), img = new Image();
-        img.onload = () => { URL.revokeObjectURL(url); resolve(img) };
-        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không đọc được ảnh ' + file.name)) };
-        img.src = url;
-    });
-}
-function compress(img, { maxSide, quality, maxChars }) {
-    let side = maxSide, q = quality;
-    for (let attempt = 0; attempt < 12; attempt++) {
-        const scale = Math.min(1, side / Math.max(img.naturalWidth, img.naturalHeight));
-        const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
-        const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
-        const data = canvas.toDataURL('image/jpeg', q);
-        if (data.length <= maxChars) return data;
-        if (q > .6) q -= .08; else side = Math.round(side * .85);
-    }
-    throw new Error('Ảnh quá lớn, không nén được');
-}
-
 // ---------- Tải lên ----------
 form.addEventListener('submit', async e => {
     e.preventDefault();
@@ -165,13 +139,6 @@ async function deletePhoto(p) {
             : 'Xóa chưa được (' + (err?.code || err?.message || 'lỗi') + '), thử lại nha.', 7000);
     }
 }
-// Thông báo nổi ở cuối màn hình (thấy được cả khi đang xem ảnh lớn)
-let toastTimer;
-function toast(msg, ms = 3500) {
-    const el = $('toast'); el.textContent = msg; el.hidden = false;
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true }, ms);
-}
-
 // ---------- Xem ảnh lớn ----------
 const lightbox = $('lightbox'), lbImg = $('lb-img'), lbCaption = $('lb-caption'), lbMeta = $('lb-meta');
 let lbIndex = -1, lbId = null, lastFocus = null;

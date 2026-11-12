@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game của tụi mình 🎲 | Bin Zin</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/love_heart_icon.svg">
+    <link rel="stylesheet" href="styles.css?v=11">
+    <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+</head>
+
+<body class="w-full">
+    <div class="app-wrapper min-h-screen flex flex-col">
+        <header class="border-b border-white/70 bg-white/50">
+            <div class="mx-auto max-w-6xl px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+                <a href="index.html" class="canva-button font-bold text-[#c85578]">BinZin World 💕</a>
+                <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Mở menu"
+                    aria-controls="main-nav" aria-expanded="false">
+                    <span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>
+                </button>
+                <nav id="main-nav" aria-label="Điều hướng chính" class="main-nav"></nav>
+            </div>
+        </header>
+
+        <main class="mx-auto w-full max-w-6xl px-4 sm:px-5 py-8 md:py-12 flex-1">
+            <section class="reveal" aria-labelledby="games-title">
+                <h1 id="games-title" class="text-[#713d53]">Game của tụi mình 🎲</h1>
+                <p class="mt-2 text-[#876777]">Chọn một trò rồi chuyền màn hình cho nhau nha!</p>
+                <div class="mt-6 flex flex-wrap gap-2" role="tablist" aria-label="Chọn trò chơi">
+                    <button type="button" data-game="who" class="canva-button pill active" role="tab" aria-selected="true">Who am I?</button>
+                    <button type="button" data-game="age" class="canva-button pill" role="tab" aria-selected="false">Guess the Age</button>
+                    <button type="button" data-game="code" class="canva-button pill" role="tab" aria-selected="false">Code Breaker</button>
+                    <button type="button" data-game="xo" class="canva-button pill" role="tab" aria-selected="false">Tic tac toe</button>
+                    <button type="button" data-game="chess" class="canva-button pill" role="tab" aria-selected="false">Cờ vua</button>
+                </div>
+
+                <section id="game-who" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" aria-label="Who am I?">
+                    <h2>Who am I? 🕵️</h2>
+                    <p class="mt-2 text-[#876777]">Mỗi người xem riêng nhân vật của mình rồi miêu tả cho người kia đoán. Che màn hình trước khi chuyền máy!</p>
+                    <div id="who-play" class="mt-6"></div>
+                    <button type="button" data-restart="who" class="canva-button secondary mt-5">Chơi lại / đổi nhân vật</button>
+                </section>
+
+                <section id="game-age" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden aria-label="Guess the Age">
+                    <h2>Guess the Age 🎂</h2>
+                    <p class="mt-2 text-[#876777]">Xem riêng độ tuổi của mình, đưa gợi ý “Độ tuổi này có được…?” và để người kia đoán con số.</p>
+                    <div id="age-play" class="mt-6"></div>
+                    <button type="button" data-restart="age" class="canva-button secondary mt-5">Chơi lại / đổi tuổi</button>
+                </section>
+
+                <section id="game-code" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden aria-label="Code Breaker">
+                    <h2>Code Breaker 🔐</h2>
+                    <p class="mt-2 text-[#876777]">Xem riêng mã bốn chữ số của mình. Sau mỗi lần người kia đoán, xem có bao nhiêu chữ số đúng và bao nhiêu vị trí đúng. Mã có thể bắt đầu bằng 0.</p>
+                    <div id="code-play" class="mt-6"></div>
+                    <button type="button" data-restart="code" class="canva-button secondary mt-5">Chơi lại / đổi mã</button>
+                </section>
+
+                <section id="game-xo" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden aria-label="Tic tac toe">
+                    <h2>Tic tac toe ⭕</h2>
+                    <p class="mt-2 text-[#876777]">Bin là X, Zin là O. Thay phiên chọn ô; ai nối được năm ô liên tiếp trước sẽ thắng.</p>
+                    <p id="xo-status" class="text-center font-bold my-5" role="status"></p>
+                    <div id="xo-board" class="board" aria-label="Bàn cờ 10 nhân 10"></div>
+                    <button id="xo-reset" type="button" class="canva-button secondary mt-5">Ván mới</button>
+                </section>
+
+                <section id="game-chess" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden aria-label="Cờ vua">
+                    <h2>Cờ vua ♟️</h2>
+                    <p class="mt-2 text-[#876777]">Hai người chơi trên cùng màn hình: Bin cầm Trắng đi trước, Zin cầm Đen. Chọn quân rồi chọn ô đến. Không hỗ trợ nhập thành hoặc bắt tốt qua đường; tốt đến cuối bàn tự phong hậu.</p>
+                    <p id="chess-status" class="text-center font-bold my-5" role="status"></p>
+                    <div id="chess-board" class="chess" aria-label="Bàn cờ vua"></div>
+                    <button id="chess-reset" type="button" class="canva-button secondary mt-5">Ván mới</button>
+                </section>
+            </section>
+        </main>
+
+        <footer class="px-5 py-8 text-center">
+            <p class="text-[#936c7c]">Made with ♡ for Bin &amp; Zin</p>
+        </footer>
+    </div>
+    <script src="nav.js?v=5"></script>
+    <script src="games.js?v=1"></script>
+</body>
+
+</html>
+

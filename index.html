@@ -1,65 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BinZin World</title>
+    <title>BinZin World 💕</title>
     <link rel="icon" type="image/svg+xml" href="assets/icons/love_heart_icon.svg">
-    <link rel="stylesheet" href="styles.css?v=10">
+    <link rel="stylesheet" href="styles.css?v=11">
     <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js" type="text/javascript"></script>
-    <!-- Firebase (bản compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
-    <script src="/_sdk/8fed440c6f94b5da.data_sdk.js" type="text/javascript"
-        integrity="sha512-hrvcCCJ6nkL5gG3mdqPDbgyAf9a/fg/zBF51sU5N3rM1WmeSu8K36+6wn9TZeAZrLIonoaPBeVyFsXxXxZjq0w=="></script>
-    <script src="/_sdk/dc9eaed14b563eb8.editing_sdk.js" type="text/javascript"
-        integrity="sha512-U1pSpFrQ86eOO8lqZ1xWYnEMHIYQODbWTwR3Q90z8aWFeEUSJieZRq+g7FYNvauPQ0rG84s3SFjWyB/NxzRXNA=="></script>
-    <script src="/_sdk/dfeb017e55db4863.resizing_sdk.js" type="text/javascript"
-        integrity="sha512-kbPBNN/FAxsctln1jqNvXyIdF7mIhQx0C+eGGC2IF3mNjNZZcftDT1wFztswSSk4KXRWYHIC3uA9NMfJV4IVUw=="></script>
 </head>
 
-<body data-template-id="__page-root" class="w-full">
-    <div class="app-wrapper">
+<body class="w-full">
+    <div class="app-wrapper min-h-screen flex flex-col">
         <header class="border-b border-white/70 bg-white/50">
-            <div class="mx-auto max-w-6xl px-5 py-4 flex flex-wrap items-center justify-between gap-3"><button
-                    type="button" data-go="home" data-template-id="brand"
-                    class="canva-button font-bold text-[#c85578]">BinZin World 💕</button>
+            <div class="mx-auto max-w-6xl px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+                <a href="index.html" class="canva-button font-bold text-[#c85578]">BinZin World 💕</a>
                 <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Mở menu" aria-controls="main-nav"
                     aria-expanded="false">
                     <span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>
                 </button>
-                <nav id="main-nav" aria-label="Điều hướng chính" class="main-nav"><button type="button" data-go="home"
-                        data-template-id="nav-home" class="canva-button nav-btn active"
-                        aria-current="page">Home</button> <a href="profile.html" data-template-id="nav-profile" class="canva-button nav-btn">Profile</a> <a
-                        href="letter.html" data-template-id="nav-letter" class="canva-button nav-btn">Đôi lời mún
-                        nói</a> <button type="button" data-go="calendar" data-template-id="nav-calendar"
-                        class="canva-button nav-btn">Ngày mấy iu nhau 🧐</button> <a href="photos.html" data-template-id="nav-photos" class="canva-button nav-btn">Photographs</a> <button
-                        type="button" data-go="wheel" data-template-id="nav-wheel"
-                        class="canva-button nav-btn">Hôm nay ăn gì 🎡</button> <button
-                        type="button" data-go="games" data-template-id="nav-games"
-                        class="canva-button nav-btn">Game</button>
-                </nav>
+                <nav id="main-nav" aria-label="Điều hướng chính" class="main-nav"></nav>
             </div>
         </header>
-        <main class="mx-auto max-w-6xl px-5 py-9 md:py-14">
-            <section id="home" class="pane reveal" aria-labelledby="home-title">
+
+        <main class="mx-auto w-full max-w-6xl px-5 py-9 md:py-14 flex-1">
+            <section id="home" class="reveal" aria-labelledby="home-title">
                 <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                     <div class="order-2 lg:order-1">
-                        <span data-template-id="home-eyebrow"
-                            class="canva-tag inline-block rounded-full px-4 py-2 bg-[#fbdce5] text-[#a84268] font-semibold">✦
+                        <span class="inline-block rounded-full px-4 py-2 bg-[#fbdce5] text-[#a84268] font-semibold">✦
                             Một góc nhỏ của tụi mình</span>
-                        <h1 id="home-title" data-template-id="home-title-text"
-                            class="canva-text mt-6 leading-tight text-[#713d53]">BinZin World 💕</h1>
-                        <p data-template-id="home-description"
-                            class="canva-text mt-5 max-w-lg leading-relaxed text-[#876777]">Chào mừng đến với thế giới
+                        <h1 id="home-title" class="mt-6 leading-tight text-[#713d53]">BinZin World 💕</h1>
+                        <p class="mt-5 max-w-lg leading-relaxed text-[#876777]">Chào mừng đến với thế giới
                             nhỏ xíu, nơi mỗi khoảnh khắc của Bin và Zin đều thật đáng yêu.</p>
                         <div class="mt-8 flex flex-wrap gap-3">
-                            <a href="profile.html" data-template-id="hero-profile-button" class="canva-button primary inline-block">Gặp Bin &amp; Zin ↗</a><button type="button"
-                                data-go="calendar" data-template-id="hero-calendar-button"
-                                class="canva-button secondary">Đếm ngày iu ♡</button>
+                            <a href="profile.html" class="canva-button primary inline-block">Gặp Bin &amp; Zin ↗</a>
+                            <a href="calendar.html" class="canva-button secondary inline-block">Đếm ngày iu ♡</a>
                         </div>
                         <!-- Trạng thái hôm nay (Mood / Status của Bin & Zin) -->
                         <div class="mt-7 grid sm:grid-cols-2 gap-3" aria-label="Trạng thái hôm nay của Bin và Zin">
@@ -86,8 +64,8 @@
                     <div class="order-1 lg:order-2 mx-auto w-full max-w-[470px]">
                         <div class="relative">
                             <div class="absolute inset-3 rounded-[45%_45%_20px_20px] bg-[#f6c8d6] rotate-6"></div>
-                            <img id="hero-img" data-template-id="hero-couple-image" loading="lazy" alt="Ảnh bìa đôi của Bin & Zin"
-                                class="canva-image hero-photo relative w-full shadow-2xl shadow-rose-200/60" hidden>
+                            <img id="hero-img" loading="lazy" alt="Ảnh bìa đôi của Bin & Zin"
+                                class="hero-photo relative w-full shadow-2xl shadow-rose-200/60" hidden>
                             <label id="hero-placeholder" for="hero-input"
                                 class="hero-photo hero-placeholder relative w-full shadow-2xl shadow-rose-200/60 cursor-pointer">
                                 <span class="text-6xl" aria-hidden="true">🧸💕🌷</span>
@@ -102,198 +80,36 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-5"><a href="profile.html" class="glass rounded-3xl p-6 text-left block"><span aria-hidden="true">🧸</span><span
-                            data-template-id="shortcut-profile"
-                            class="canva-text block mt-3 font-bold">Profile</span></a> <a href="letter.html"
-                        class="glass rounded-3xl p-6 text-left block"><span aria-hidden="true">💌</span><span
-                            data-template-id="shortcut-letter" class="canva-text block mt-3 font-bold">Đôi lời mún
-                            nói</span></a> <a href="photos.html" class="glass rounded-3xl p-6 text-left block"><span aria-hidden="true">📸</span><span
-                            data-template-id="shortcut-photos" class="canva-text block mt-3 font-bold">Ảnh kỷ
-                            niệm</span></a> <button type="button" data-go="wheel"
-                        class="glass rounded-3xl p-6 text-left"><span aria-hidden="true">🎡</span><span
-                            class="canva-text block mt-3 font-bold">Hôm nay ăn gì?</span></button> <button type="button" data-go="games"
-                        class="glass rounded-3xl p-6 text-left"><span aria-hidden="true">🎲</span><span
-                            data-template-id="shortcut-games" class="canva-text block mt-3 font-bold">Chơi cùng
-                            nhau</span></button>
+                <div class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                    <a href="profile.html" class="glass rounded-3xl p-6 text-left block">
+                        <span aria-hidden="true">🧸</span>
+                        <span class="block mt-3 font-bold">Profile</span>
+                    </a>
+                    <a href="letter.html" class="glass rounded-3xl p-6 text-left block">
+                        <span aria-hidden="true">💌</span>
+                        <span class="block mt-3 font-bold">Đôi lời mún nói</span>
+                    </a>
+                    <a href="photos.html" class="glass rounded-3xl p-6 text-left block">
+                        <span aria-hidden="true">📸</span>
+                        <span class="block mt-3 font-bold">Ảnh kỷ niệm</span>
+                    </a>
+                    <a href="wheel.html" class="glass rounded-3xl p-6 text-left block">
+                        <span aria-hidden="true">🎡</span>
+                        <span class="block mt-3 font-bold">Hôm nay ăn gì?</span>
+                    </a>
+                    <a href="games.html" class="glass rounded-3xl p-6 text-left block">
+                        <span aria-hidden="true">🎲</span>
+                        <span class="block mt-3 font-bold">Chơi cùng nhau</span>
+                    </a>
                 </div>
-            </section>
-            <section id="calendar" class="pane reveal" hidden aria-labelledby="calendar-title">
-                <h1 id="calendar-title" data-template-id="calendar-title-text"
-                    class="canva-text text-center text-[#713d53]">Ngày mấy iu nhau 🧐</h1>
-                <p data-template-id="calendar-intro" class="canva-text mt-3 text-center text-[#876777]">Tụi mình bắt đầu
-                    yêu nhau từ ngày 04/07/2026 💕</p>
-                <div class="mt-8 grid md:grid-cols-2 gap-6">
-                    <div class="glass rounded-[30px] p-7">
-                        <p data-template-id="date-label" class="canva-text font-semibold">Ngày bắt đầu iu 💕</p>
-                        <!-- Ngày bắt đầu yêu được cố định: 04/07/2026 -->
-                        <input id="start-date" type="hidden" value="2026-07-04">
-                        <p class="field mt-3 font-semibold text-[#bc4f71]">04/07/2026</p>
-                        <div class="mt-8 rounded-3xl bg-[#ffe7ed] p-6 text-center">
-                            <p data-template-id="days-label" class="canva-text text-[#a84268]">Mình đã bên nhau</p>
-                            <p id="days-count" class="my-2 font-['Fraunces'] text-6xl font-bold text-[#bc4f71]"
-                                aria-live="polite">—</p>
-                            <p data-template-id="days-unit" class="canva-text text-[#a84268]">ngày yêu thương ♡</p>
-                        </div>
-                        <p id="date-status" role="status" class="mt-4 text-center"></p>
-                    </div>
-                    <div class="glass rounded-[30px] p-5 sm:p-7">
-                        <div class="flex justify-between items-center gap-3">
-                            <button id="previous-month" type="button" aria-label="Tháng trước"
-                                class="secondary">‹</button>
-                            <h2 id="month-title" class="text-center"></h2><button id="next-month" type="button"
-                                aria-label="Tháng sau" class="secondary">›</button>
-                        </div>
-                        <div class="calendar-grid mt-6 text-center text-[#a84268] font-bold" aria-hidden="true">
-                            <span>CN</span><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span>
-                        </div>
-                        <div id="calendar-days" class="calendar-grid mt-3" aria-label="Lịch tháng"></div><button
-                            id="today-button" type="button" data-template-id="today-button-text"
-                            class="canva-button secondary mt-5">Hôm nay</button>
-                    </div>
-                </div>
-
-                <!-- Cột mốc & Đếm ngược ngày kỷ niệm -->
-                <div class="mt-8 grid lg:grid-cols-2 gap-6">
-                    <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col min-w-0 overflow-hidden">
-                        <div class="flex flex-wrap items-center justify-between gap-2">
-                            <h2 class="text-[#713d53]">⏳ Đếm ngược cột mốc sắp tới</h2>
-                            <button type="button" id="cd-reset-btn" class="secondary text-xs">Khôi phục mặc định</button>
-                        </div>
-                        <p class="mt-1 text-sm text-[#876777]">Thêm, sửa, xóa các cột mốc để tự động đếm ngược số ngày 💕</p>
-                        <form id="countdown-form" class="mt-4 flex flex-col gap-2.5">
-                            <div class="grid grid-cols-[54px_1fr] gap-2">
-                                <input id="cd-icon" class="field text-center text-lg !px-1" maxlength="4" value="💖" required aria-label="Biểu tượng">
-                                <input id="cd-title" class="field" maxlength="80" placeholder="Tên cột mốc (VD: 200 ngày iu)…" required>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
-                                <input id="cd-date" type="date" class="field" required>
-                                <div class="flex gap-1.5">
-                                    <button type="submit" id="cd-submit" class="primary flex-1 sm:flex-none">Thêm</button>
-                                    <button type="button" id="cd-cancel" class="secondary" hidden>Hủy</button>
-                                </div>
-                            </div>
-                        </form>
-                        <ul id="auto-milestones" class="mt-5 space-y-3 flex-1"></ul>
-                        <p id="cd-empty" class="text-center text-sm text-[#876777] py-6" hidden>Chưa có cột mốc đếm ngược nào. Thêm sự kiện ở trên nha ♡</p>
-                    </div>
-                    <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col min-w-0 overflow-hidden">
-                        <h2 class="text-[#713d53]">📌 Kỷ niệm riêng của tụi mình</h2>
-                        <p class="mt-1 text-sm text-[#876777]">Thêm những ngày đáng nhớ (hẹn hò đầu tiên, chuyến đi chơi, sự kiện sắp tới…)</p>
-                        <form id="milestone-form" class="mt-4 flex flex-col gap-2.5">
-                            <input id="ms-title" class="field" maxlength="80" placeholder="VD: Chuyến đi Đà Lạt…" required>
-                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
-                                <input id="ms-date" type="date" class="field" required>
-                                <div class="flex gap-1.5">
-                                    <button type="submit" id="ms-submit" class="primary flex-1 sm:flex-none">Thêm</button>
-                                    <button type="button" id="ms-cancel" class="secondary" hidden>Hủy</button>
-                                </div>
-                            </div>
-                        </form>
-                        <ul id="custom-milestones" class="mt-4 space-y-2 flex-1"></ul>
-                        <p id="custom-ms-empty" class="text-center text-sm text-[#876777] py-6" hidden>Chưa có ngày kỷ niệm riêng nào. Thêm cột mốc đầu tiên nha ♡</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Vòng quay "Hôm nay ăn gì / Đi đâu?" -->
-            <section id="wheel" class="pane reveal" hidden aria-labelledby="wheel-title">
-                <h1 id="wheel-title" class="text-center text-[#713d53]">Hôm nay ăn gì / Đi đâu? 🎡</h1>
-                <p class="mt-2 text-center text-[#876777]">Để vòng quay quyết định giúp Bin &amp; Zin khỏi phải đau đầu suy nghĩ nha!</p>
-                <div class="mt-6 flex justify-center gap-2" role="tablist" aria-label="Chọn loại vòng quay">
-                    <button type="button" data-wheel-tab="eat" class="pill active font-bold" role="tab" aria-selected="true">🍜 Hôm nay ăn gì?</button>
-                    <button type="button" data-wheel-tab="go" class="pill font-bold" role="tab" aria-selected="false">🛵 Hôm nay đi đâu?</button>
-                </div>
-
-                <div class="mt-8 grid lg:grid-cols-[minmax(0,420px)_1fr] gap-8 items-center">
-                    <div class="glass rounded-[32px] p-6 flex flex-col items-center">
-                        <div class="wheel-stage">
-                            <div class="wheel-pointer" aria-hidden="true">▼</div>
-                            <canvas id="wheel-canvas" width="340" height="340" class="wheel-canvas"></canvas>
-                        </div>
-                        <button type="button" id="wheel-spin" class="primary mt-6 w-full max-w-xs text-lg">🎯 Quay ngay!</button>
-                        <p id="wheel-result" role="status" aria-live="polite" class="mt-4 text-center font-bold text-xl text-[#c85578] min-h-8"></p>
-                    </div>
-
-                    <div class="glass rounded-[32px] p-6 sm:p-7">
-                        <div class="flex items-center justify-between gap-2">
-                            <h2 id="wheel-list-title" class="text-[#713d53]">Danh sách món ăn</h2>
-                            <button type="button" id="wheel-reset-default" class="secondary text-xs">Khôi phục mặc định</button>
-                        </div>
-                        <form id="wheel-add-form" class="mt-4 flex gap-2">
-                            <input id="wheel-item-input" class="field flex-1" maxlength="50" placeholder="Thêm lựa chọn mới…" required>
-                            <button type="submit" class="primary">Thêm</button>
-                        </form>
-                        <ul id="wheel-items" class="mt-4 flex flex-wrap gap-2"></ul>
-                    </div>
-                </div>
-            </section>
-            <section id="games" class="pane reveal" hidden aria-labelledby="games-title">
-                <h1 id="games-title" data-template-id="games-title-text" class="canva-text text-[#713d53]">Game của tụi
-                    mình 🎲</h1>
-                <p data-template-id="games-intro" class="canva-text mt-2 text-[#876777]">Chọn một trò rồi chuyền màn
-                    hình cho nhau nha!</p>
-                <div class="mt-6 flex flex-wrap gap-2" role="tablist" aria-label="Chọn trò chơi"><button type="button"
-                        data-game="who" data-template-id="game-tab-who" class="canva-button pill active" role="tab"
-                        aria-selected="true">Who am I?</button> <button type="button" data-game="age"
-                        data-template-id="game-tab-age" class="canva-button pill" role="tab" aria-selected="false">Guess
-                        the Age</button> <button type="button" data-game="code" data-template-id="game-tab-code"
-                        class="canva-button pill" role="tab" aria-selected="false">Code Breaker</button> <button
-                        type="button" data-game="xo" data-template-id="game-tab-xo" class="canva-button pill" role="tab"
-                        aria-selected="false">Tic tac toe</button> <button type="button" data-game="chess"
-                        data-template-id="game-tab-chess" class="canva-button pill" role="tab" aria-selected="false">Cờ
-                        vua</button>
-                </div>
-                <section id="game-who" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" aria-label="Who am I?">
-                    <h2 data-template-id="who-title" class="canva-text">Who am I? 🕵️</h2>
-                    <p data-template-id="who-help" class="canva-text mt-2 text-[#876777]">Mỗi người xem riêng nhân vật
-                        của mình rồi miêu tả cho người kia đoán. Che màn hình trước khi chuyền máy!</p>
-                    <div id="who-play" class="mt-6"></div><button type="button" data-restart="who"
-                        data-template-id="who-restart" class="canva-button secondary mt-5">Chơi lại / đổi nhân
-                        vật</button>
-                </section>
-                <section id="game-age" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden
-                    aria-label="Guess the Age">
-                    <h2 data-template-id="age-title" class="canva-text">Guess the Age 🎂</h2>
-                    <p data-template-id="age-help" class="canva-text mt-2 text-[#876777]">Xem riêng độ tuổi của mình,
-                        đưa gợi ý “Độ tuổi này có được…?” và để người kia đoán con số.</p>
-                    <div id="age-play" class="mt-6"></div><button type="button" data-restart="age"
-                        data-template-id="age-restart" class="canva-button secondary mt-5">Chơi lại / đổi tuổi</button>
-                </section>
-                <section id="game-code" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden
-                    aria-label="Code Breaker">
-                    <h2 data-template-id="code-title" class="canva-text">Code Breaker 🔐</h2>
-                    <p data-template-id="code-help" class="canva-text mt-2 text-[#876777]">Xem riêng mã bốn chữ số của
-                        mình. Sau mỗi lần người kia đoán, xem có bao nhiêu chữ số đúng và bao nhiêu vị trí đúng. Mã có
-                        thể bắt đầu bằng 0.</p>
-                    <div id="code-play" class="mt-6"></div><button type="button" data-restart="code"
-                        data-template-id="code-restart" class="canva-button secondary mt-5">Chơi lại / đổi mã</button>
-                </section>
-                <section id="game-xo" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden
-                    aria-label="Tic tac toe">
-                    <h2 data-template-id="xo-title" class="canva-text">Tic tac toe ⭕</h2>
-                    <p data-template-id="xo-help" class="canva-text mt-2 text-[#876777]">Bin là X, Zin là O. Thay phiên
-                        chọn ô; ai nối được năm ô liên tiếp trước sẽ thắng.</p>
-                    <p id="xo-status" class="text-center font-bold my-5" role="status"></p>
-                    <div id="xo-board" class="board" aria-label="Bàn cờ 10 nhân 10"></div><button id="xo-reset"
-                        type="button" data-template-id="xo-reset-text" class="canva-button secondary mt-5">Ván
-                        mới</button>
-                </section>
-                <section id="game-chess" class="game-pane glass rounded-3xl p-5 sm:p-8 mt-6" hidden aria-label="Cờ vua">
-                    <h2 data-template-id="chess-title" class="canva-text">Cờ vua ♟️</h2>
-                    <p data-template-id="chess-help" class="canva-text mt-2 text-[#876777]">Hai người chơi trên cùng màn
-                        hình: Bin cầm Trắng đi trước, Zin cầm Đen. Chọn quân rồi chọn ô đến. Không hỗ trợ nhập thành
-                        hoặc bắt tốt qua đường; tốt đến cuối bàn tự phong hậu.</p>
-                    <p id="chess-status" class="text-center font-bold my-5" role="status"></p>
-                    <div id="chess-board" class="chess" aria-label="Bàn cờ vua"></div><button id="chess-reset"
-                        type="button" data-template-id="chess-reset-text" class="canva-button secondary mt-5">Ván
-                        mới</button>
-                </section>
             </section>
         </main>
+
         <footer class="px-5 py-8 text-center">
-            <p data-template-id="footer-text" class="canva-footer text-[#936c7c]">Made with ♡ for Bin &amp; Zin</p>
+            <p class="text-[#936c7c]">Made with ♡ for Bin &amp; Zin</p>
         </footer>
     </div>
+
     <!-- Hộp xác nhận xóa ảnh bìa -->
     <div id="confirm-box" class="confirm-backdrop" hidden role="alertdialog" aria-modal="true"
         aria-labelledby="confirm-text">
@@ -306,6 +122,7 @@
             </div>
         </div>
     </div>
+
     <!-- Hộp chỉnh sửa trạng thái (Mood / Status) -->
     <div id="mood-modal" class="confirm-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="mood-modal-title">
         <form id="mood-form" class="confirm-card text-left">
@@ -322,9 +139,10 @@
             </div>
         </form>
     </div>
+
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-    <script src="nav.js?v=4"></script>
-    <script src="script.js?v=7"></script>
+    <script src="nav.js?v=5"></script>
+    <script src="script.js?v=8"></script>
 </body>
 
 </html>

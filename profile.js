@@ -1,5 +1,5 @@
 // ===== Trang Profile: xem, chỉnh sửa thông tin và đổi ảnh đại diện của Bin & Zin trên Firebase =====
-const $ = id => document.getElementById(id);
+const { toast, loadImage, compressImage: compress, firebaseReady } = window.BinZin;
 const LOCAL_KEY = 'binzin-profiles';
 const AVATAR = { maxSide: 900, quality: .84, maxChars: 650000 };
 
@@ -28,13 +28,6 @@ const statusEl = $('profile-status'), card = $('profile-card');
 const viewPane = $('view-pane'), editForm = $('edit-form'), editBtn = $('edit-btn');
 const viewPhoto = $('view-photo'), viewPlaceholder = $('view-placeholder'), placeholderEmoji = $('placeholder-emoji');
 const avatarInput = $('avatar-input'), removePhotoBtn = $('remove-photo-btn');
-
-// ---------- Thông báo nổi ----------
-let toastTimer;
-function toast(msg, ms = 3200) {
-    const el = $('toast'); el.textContent = msg; el.hidden = false;
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true }, ms);
-}
 
 // ---------- Hiển thị ----------
 function render() {
@@ -92,12 +85,9 @@ editBtn.addEventListener('click', () => setEditing(true));
 $('cancel-btn').addEventListener('click', () => setEditing(false));
 
 // ---------- Kết nối Firebase ----------
-const cfg = window.FIREBASE_CONFIG || {};
-const firebaseReady = window.firebase && cfg.apiKey && !String(cfg.apiKey).startsWith('YOUR_');
 let saveProfile;
 
 if (firebaseReady) {
-    firebase.initializeApp(cfg);
     const col = firebase.firestore().collection('profiles');
     ['bin', 'zin'].forEach(key => {
         col.doc(key).onSnapshot(snap => {
@@ -165,29 +155,6 @@ editForm.addEventListener('submit', async e => {
 });
 
 // ---------- Nén và đổi ảnh đại diện ----------
-function loadImage(file) {
-    return new Promise((resolve, reject) => {
-        const url = URL.createObjectURL(file), img = new Image();
-        img.onload = () => { URL.revokeObjectURL(url); resolve(img) };
-        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không đọc được ảnh')) };
-        img.src = url;
-    });
-}
-
-function compress(img, { maxSide, quality, maxChars }) {
-    let side = maxSide, q = quality;
-    for (let attempt = 0; attempt < 12; attempt++) {
-        const scale = Math.min(1, side / Math.max(img.naturalWidth, img.naturalHeight));
-        const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
-        const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
-        const data = canvas.toDataURL('image/jpeg', q);
-        if (data.length <= maxChars) return data;
-        if (q > .6) q -= .08; else side = Math.round(side * .85);
-    }
-    throw new Error('Ảnh quá lớn');
-}
-
 avatarInput.addEventListener('change', async () => {
     const file = avatarInput.files[0];
     avatarInput.value = '';
