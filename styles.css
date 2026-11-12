@@ -52,6 +52,7 @@ h3 {
 
 .nav-btn,
 .pill {
+    display: inline-block;
     border-radius: 999px;
     padding: .68rem 1rem;
     transition: background .2s, transform .2s
@@ -112,6 +113,17 @@ textarea:focus-visible {
     aspect-ratio: 4/4.2;
     object-fit: cover;
     border-radius: 45% 45% 20px 20px
+}
+
+.hero-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    background: linear-gradient(155deg, #ffe7ed, #fff9fb);
+    border: 3px solid #fff
 }
 
 .calendar-grid {
@@ -213,6 +225,443 @@ textarea:focus-visible {
     }
 }
 
+/* ===== Khung chat "Đôi lời mún nói" ===== */
+.chat-list {
+    list-style: none;
+    margin: 0;
+    padding: .25rem;
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+    max-height: 60vh;
+    min-height: 220px;
+    overflow-y: auto;
+    scroll-behavior: smooth
+}
+
+.chat-row {
+    display: flex;
+    justify-content: flex-start
+}
+
+.chat-row.mine {
+    justify-content: flex-end
+}
+
+.chat-bubble {
+    max-width: min(85%, 520px);
+    padding: .85rem 1.1rem;
+    border-radius: 22px 22px 22px 6px;
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: 0 6px 18px rgba(143, 69, 91, .08);
+    animation: rise .3s both
+}
+
+.chat-row.mine .chat-bubble {
+    border-radius: 22px 22px 6px 22px;
+    background: #f8d5df;
+    border-color: #f3c2d0
+}
+
+.chat-meta {
+    font-size: .78rem;
+    color: var(--muted);
+    margin-bottom: .25rem
+}
+
+.chat-meta strong {
+    color: var(--rose)
+}
+
+.chat-title {
+    font-weight: 700;
+    font-size: 1.05rem !important;
+    color: #713d53;
+    word-break: break-word
+}
+
+.chat-content {
+    margin-top: .3rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.55
+}
+
+/* Khung chọn người gửi (Bin / Zin) */
+.name-choice {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem
+}
+
+.name-choice label {
+    position: relative;
+    display: block;
+    cursor: pointer
+}
+
+/* Ẩn hoàn toàn nút radio mặc định, chỉ giữ cho bàn phím/trình đọc màn hình */
+.name-choice input[type="radio"] {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    pointer-events: none
+}
+
+.name-choice span {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    padding: .85rem 1rem;
+    border-radius: 18px;
+    border: 2px solid var(--line);
+    background: linear-gradient(180deg, #fff, #fff6f8);
+    color: #713d53;
+    font-weight: 700;
+    font-size: 1.05rem;
+    box-shadow: 0 4px 12px rgba(143, 69, 91, .06);
+    transition: transform .2s, box-shadow .2s, border-color .2s, background .2s, color .2s;
+    user-select: none
+}
+
+/* Dấu ✓ ở góc khi được chọn */
+.name-choice span::after {
+    content: "✓";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--rose);
+    font-size: .8rem;
+    font-weight: 800;
+    box-shadow: 0 3px 8px rgba(143, 69, 91, .25);
+    transform: scale(0);
+    transition: transform .2s
+}
+
+.name-choice label:hover span {
+    border-color: #f3b6c8;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(143, 69, 91, .12)
+}
+
+.name-choice input:checked+span {
+    background: linear-gradient(135deg, #e0789a, #c85578);
+    border-color: #c85578;
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(200, 85, 120, .35)
+}
+
+.name-choice input:checked+span::after {
+    transform: scale(1)
+}
+
+.name-choice input:focus-visible+span {
+    outline: 3px solid #a93663;
+    outline-offset: 3px
+}
+/* ===== Trang Photographs ===== */
+.drop-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .35rem;
+    padding: 2rem 1rem;
+    border: 2px dashed #efb8c8;
+    border-radius: 24px;
+    background: #fffafb;
+    text-align: center;
+    cursor: pointer;
+    transition: background .2s, border-color .2s
+}
+
+.drop-zone:hover,
+.drop-zone.dragging {
+    background: #ffe7ed;
+    border-color: var(--rose)
+}
+
+.drop-zone:focus-within {
+    outline: 3px solid #a93663;
+    outline-offset: 3px
+}
+
+.preview-list {
+    display: flex;
+    gap: .5rem;
+    overflow-x: auto;
+    padding-bottom: .25rem
+}
+
+.preview-list img {
+    width: 72px;
+    height: 72px;
+    flex: none;
+    object-fit: cover;
+    border-radius: 14px;
+    border: 2px solid #fff;
+    box-shadow: 0 3px 10px rgba(143, 69, 91, .15)
+}
+
+.photo-grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 1rem
+}
+
+.photo-card {
+    position: relative;
+    background: rgba(255, 255, 255, .85);
+    border: 1px solid #fff;
+    border-radius: 24px;
+    padding: .6rem;
+    box-shadow: 0 10px 30px rgba(143, 69, 91, .09);
+    animation: rise .35s both
+}
+
+.photo-open {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border-radius: 18px;
+    overflow: hidden
+}
+
+.photo-open img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    transition: transform .35s
+}
+
+.photo-open:hover img {
+    transform: scale(1.05)
+}
+
+.photo-caption {
+    padding: .55rem .35rem .2rem;
+    word-break: break-word
+}
+
+.photo-delete {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .92);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .15);
+    opacity: 0;
+    transition: opacity .2s, transform .2s
+}
+
+.photo-card:hover .photo-delete,
+.photo-delete:focus-visible {
+    opacity: 1
+}
+
+@media(hover:none) {
+    .photo-delete {
+        opacity: 1
+    }
+}
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: 1rem;
+    background: rgba(45, 20, 32, .88);
+    animation: rise .2s both
+}
+
+.lb-figure {
+    max-width: min(1100px, 100%);
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    text-align: center
+}
+
+.lb-figure img {
+    max-width: 100%;
+    max-height: calc(100vh - 170px);
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .4)
+}
+
+.lb-figure figcaption {
+    margin-top: .8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .25rem
+}
+
+.lb-btn {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .15);
+    color: #fff;
+    font-size: 1.6rem;
+    line-height: 1
+}
+
+.lb-btn:hover {
+    background: rgba(255, 255, 255, .3)
+}
+
+.lb-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.1rem
+}
+
+.lb-delete {
+    margin-top: .5rem;
+    padding: .5rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .15);
+    color: #fff;
+    font-size: .9rem
+}
+
+.lb-delete:hover {
+    background: #c85578
+}
+
+@media(max-width:640px) {
+
+    .lb-prev,
+    .lb-next {
+        position: absolute;
+        bottom: 1rem
+    }
+
+    .lb-prev {
+        left: 1rem
+    }
+
+    .lb-next {
+        right: 1rem
+    }
+
+    .photo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .6rem
+    }
+}
+
+.confirm-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(45, 20, 32, .6);
+    animation: rise .2s both
+}
+
+.confirm-card {
+    width: min(360px, 100%);
+    padding: 1.5rem;
+    border-radius: 28px;
+    background: #fff;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .3)
+}
+
+.confirm-img {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1rem;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 6px 18px rgba(143, 69, 91, .2)
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1.5rem;
+    z-index: 70;
+    transform: translateX(-50%);
+    max-width: calc(100% - 2rem);
+    padding: .75rem 1.25rem;
+    border-radius: 999px;
+    background: #713d53;
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25)
+}
+
+/* ===== Trang Profile ===== */
+.profile-avatar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center
+}
+
+.profile-avatar-box {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 4/4.5;
+    border-radius: 28px;
+    overflow: hidden;
+    background: linear-gradient(145deg, #ffe7ed, #fff6f8);
+    border: 3px solid #fff;
+    box-shadow: 0 14px 35px rgba(143, 69, 91, .14);
+    display: grid;
+    place-items: center
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover
+}
+
+.profile-avatar-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    text-align: center
+}
+
 /* ===== Thanh điều hướng ===== */
 .main-nav {
     display: flex;
@@ -275,6 +724,7 @@ textarea:focus-visible {
     }
 
     .main-nav .nav-btn {
+        display: block;
         width: 100%;
         text-align: left;
         border-radius: 12px

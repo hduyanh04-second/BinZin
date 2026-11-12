@@ -46,8 +46,8 @@ menuToggle?.addEventListener('click', () => setMenu(!mainNav.classList.contains(
 document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false) });
 document.addEventListener('click', e => { if (mainNav?.classList.contains('open') && !mainNav.contains(e.target) && !menuToggle.contains(e.target)) setMenu(false) });
 window.matchMedia('(min-width:768px)').addEventListener('change', e => { if (e.matches) setMenu(false) });
-document.querySelectorAll('[data-person]').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('[data-person]').forEach(b => { const active = b === button; b.setAttribute('aria-selected', String(active)); b.classList.toggle('primary', active); b.classList.toggle('secondary', !active) }); document.querySelectorAll('.profile-pane').forEach(p => p.hidden = p.id !== 'profile-' + button.dataset.person) }));
-$('letter-form').addEventListener('submit', e => { e.preventDefault(); const sender = $('sender').value.trim(), subject = $('subject').value.trim(), message = $('message').value.trim(); if (!sender || !subject || !message) return; $('mail-status').textContent = 'Đã mở trình soạn thư (nếu thiết bị có ứng dụng email). Hãy bấm Gửi ở đó để hoàn tất.'; window.open('mailto:nmaitrang0809@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent('Từ: ' + sender + '\n\n' + message), '_blank') });
+// Mở đúng mục khi đến từ trang khác (vd: letter.html -> index.html#calendar)
+window.addEventListener('load', () => { const target = location.hash.slice(1); if (target && document.getElementById(target)?.classList.contains('pane')) document.querySelector(`nav [data-go="${target}"]`)?.click() });
 let shownYear = new Date().getFullYear(), shownMonth = new Date().getMonth();
 function startDate() { if (!$('start-date').value) return null; const [y, m, d] = $('start-date').value.split('-').map(Number), date = new Date(y, m - 1, d); return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d ? date : null }
 function renderCalendar() { const now = new Date(); $('month-title').textContent = `Tháng ${shownMonth + 1} / ${shownYear}`; $('calendar-days').replaceChildren(); const offset = new Date(shownYear, shownMonth, 1).getDay(), count = new Date(shownYear, shownMonth + 1, 0).getDate(), start = startDate(); for (let i = 0; i < Math.ceil((offset + count) / 7) * 7; i++) { const date = new Date(shownYear, shownMonth, i - offset + 1), cell = document.createElement('span'); cell.className = 'day' + (date.getMonth() !== shownMonth ? ' text-[#c5adb5]' : ''); if (date.toDateString() === now.toDateString()) cell.classList.add('today'); if (start && date.toDateString() === start.toDateString()) cell.classList.add('start'); cell.textContent = date.getDate(); $('calendar-days').append(cell) } }
@@ -58,15 +58,6 @@ $('today-button').onclick = () => { const now = new Date(); shownYear = now.getF
 // Ngày bắt đầu yêu cố định (04/07/2026): tự động đếm khi tải trang và cập nhật mỗi phút (qua nửa đêm sẽ tự tăng)
 function updateLoveDays() { $('start-date').dispatchEvent(new Event('change')) }
 updateLoveDays(); setInterval(() => { const y = shownYear, m = shownMonth; updateLoveDays(); shownYear = y; shownMonth = m; renderCalendar() }, 60000);
-let backendRecords = [], dataReady = false, loadTimer;
-function dataMessage(message, retry = false) { $('data-status').textContent = message; $('data-retry').hidden = !retry }
-function renderCaptions() { const list = $('caption-list'), seen = new Set(); backendRecords.forEach(record => { const id = String(record.__backendId); seen.add(id); let row = [...list.children].find(el => el.dataset.recordId === id); if (!row) { row = $('caption-row-template').content.firstElementChild.cloneNode(true); row.dataset.recordId = id; list.append(row) } const text = row.querySelector('[data-template-id="caption-row-text"]'); if (text.textContent !== (record.caption || '')) text.textContent = record.caption || ''; const date = row.querySelector('time'), formatted = record.created_at && !isNaN(new Date(record.created_at)) ? new Date(record.created_at).toLocaleDateString('vi-VN') : ''; if (date.textContent !== formatted) date.textContent = formatted });[...list.children].forEach(row => { if (!seen.has(row.dataset.recordId)) row.remove() }); if (dataReady) dataMessage(backendRecords.length ? `${backendRecords.length} kỷ niệm đã lưu.` : 'Chưa có chú thích nào. Viết chiếc đầu tiên nha!') }
-const dataHandler = { onDataChanged(data) { clearTimeout(loadTimer); dataReady = true; backendRecords = data; renderCaptions() } };
-async function initializeData() { dataReady = false; dataMessage('Đang tải chú thích…'); clearTimeout(loadTimer); loadTimer = setTimeout(() => { if (!dataReady) dataMessage('Không tải được chú thích. Bạn có thể thử lại.', true) }, 8000); try { const result = await window.dataSdk.init(dataHandler); if (!result.isOk) { clearTimeout(loadTimer); dataMessage('Không kết nối được Canva Sheet. Hãy thử lại.', true) } } catch { clearTimeout(loadTimer); dataMessage('Không kết nối được Canva Sheet. Hãy thử lại.', true) } }
-$('data-retry').onclick = initializeData;
-$('caption-form').addEventListener('submit', async e => { e.preventDefault(); const caption = $('caption-input').value.trim(), button = e.currentTarget.querySelector('button'); if (!caption || !dataReady) { dataMessage('Hãy chờ tải xong rồi thử lại.', !dataReady); return } if (backendRecords.length >= 999) { dataMessage('Đã đạt giới hạn 999 kỷ niệm. Xóa bớt trước khi thêm nhé.'); return } button.disabled = true; try { const result = await window.dataSdk.create({ image_url: '', caption, created_at: new Date().toISOString() }); if (!result.isOk) dataMessage('Không thể xác nhận đã lưu. Hãy kiểm tra lại trước khi thử lần nữa.'); else { $('caption-input').value = ''; dataMessage('Đã lưu kỷ niệm 💕') } } catch { dataMessage('Không thể xác nhận đã lưu. Hãy kiểm tra lại trước khi thử lần nữa.') } finally { button.disabled = false } });
-$('caption-list').addEventListener('click', async e => { const button = e.target.closest('button'), row = button?.closest('li'); if (!row) return; const del = row.querySelector('[data-template-id="caption-delete"]'), confirm = row.querySelector('[data-template-id="caption-confirm"]'), cancel = row.querySelector('[data-template-id="caption-cancel"]'); if (button === del) { del.hidden = true; confirm.hidden = false; cancel.hidden = false; return } if (button === cancel) { del.hidden = false; confirm.hidden = true; cancel.hidden = true; return } if (button !== confirm) return; const record = backendRecords.find(r => String(r.__backendId) === row.dataset.recordId); if (!record) { dataMessage('Kỷ niệm này không còn tồn tại.'); return } confirm.disabled = true; try { const result = await window.dataSdk.delete(record); if (!result.isOk) dataMessage('Không thể xác nhận đã xóa. Hãy kiểm tra lại trước khi thử lần nữa.'); else { row.remove(); dataMessage('Đã xóa kỷ niệm.') } } catch { dataMessage('Không thể xác nhận đã xóa. Hãy kiểm tra lại trước khi thử lần nữa.') } finally { confirm.disabled = false; del.hidden = false; confirm.hidden = true; cancel.hidden = true } });
-initializeData();
 document.querySelectorAll('[data-game]').forEach(button => button.addEventListener('click', () => { activeGame = button.dataset.game; document.querySelectorAll('.game-pane').forEach(p => p.hidden = p.id !== 'game-' + activeGame); document.querySelectorAll('[data-game]').forEach(b => { const active = b === button; b.classList.toggle('active', active); b.setAttribute('aria-selected', String(active)) }); if (['who', 'age', 'code'].includes(activeGame)) newRound(activeGame) }));
 document.querySelectorAll('[data-restart]').forEach(b => b.addEventListener('click', () => newRound(b.dataset.restart)));
 let xo = Array(100).fill(''), xoTurn = 'X', xoWinner = '';
@@ -83,3 +74,69 @@ function renderChess() { const board = $('chess-board'); board.replaceChildren()
 function playChess(r, c) { if (finished) return; if (selected && legal(chess, selected, [r, c])) { const piece = chess[selected[0]][selected[1]]; chess[r][c] = piece[1] === 'P' && (r === 0 || r === 7) ? piece[0] + 'Q' : piece; chess[selected[0]][selected[1]] = null; selected = null; turn = turn === 'w' ? 'b' : 'w'; if (!hasMove(chess, turn)) { finished = true; $('chess-status').textContent = inCheck(chess, turn) ? `{turn==='w'?'Zin':'Bin'} thắng — chiếu hết! 🎉` : 'Hòa — hết nước đi hợp lệ.' } } else selected = chess[r][c]?.[0] === turn ? [r, c] : null; renderChess() }
 function resetChess() { chess = [['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR'], Array(8).fill('bP'), ...Array.from({ length: 4 }, () => Array(8).fill(null)), Array(8).fill('wP'), ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR']]; turn = 'w'; selected = null; finished = false; renderChess() }
 $('chess-reset').onclick = resetChess; resetChess();
+// ===== Ảnh bìa ở mục Home (lưu trên Firebase Firestore: profiles/home) =====
+(() => {
+    const heroImg = $('hero-img'), heroPlaceholder = $('hero-placeholder'), heroInput = $('hero-input'), heroRemove = $('hero-remove');
+    if (!heroImg || !heroInput) return;
+    const HERO_KEY = 'binzin-home-photo';
+    const HERO_SPEC = { maxSide: 1200, quality: .85, maxChars: 700000 };
+    let toastTimer;
+    const toast = (msg, ms = 3200) => { const el = $('toast'); if (!el) return; el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true }, ms) };
+    const showHero = src => {
+        if (src) { heroImg.src = src; heroImg.hidden = false; heroPlaceholder.hidden = true; heroRemove.hidden = false }
+        else { heroImg.removeAttribute('src'); heroImg.hidden = true; heroPlaceholder.hidden = false; heroRemove.hidden = true }
+    };
+    const cfg = window.FIREBASE_CONFIG || {};
+    const firebaseReady = window.firebase && cfg.apiKey && !String(cfg.apiKey).startsWith('YOUR_');
+    let saveHero;
+    if (firebaseReady) {
+        if (!firebase.apps.length) firebase.initializeApp(cfg);
+        const docRef = firebase.firestore().collection('profiles').doc('home');
+        docRef.onSnapshot(snap => { showHero(snap.exists ? (snap.data().photo || '') : '') }, err => console.error(err));
+        saveHero = photo => docRef.set({ name: 'Home', bio: '', about: '', likes: '', photo, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    } else {
+        showHero(localStorage.getItem(HERO_KEY) || '');
+        saveHero = async photo => { if (photo) localStorage.setItem(HERO_KEY, photo); else localStorage.removeItem(HERO_KEY); showHero(photo) };
+    }
+    const loadImg = file => new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image(); im.onload = () => { URL.revokeObjectURL(u); res(im) }; im.onerror = () => { URL.revokeObjectURL(u); rej(new Error('Không đọc được ảnh')) }; im.src = u });
+    const compress = (im, { maxSide, quality, maxChars }) => {
+        let side = maxSide, q = quality;
+        for (let i = 0; i < 12; i++) {
+            const s = Math.min(1, side / Math.max(im.naturalWidth, im.naturalHeight)), w = Math.round(im.naturalWidth * s), h = Math.round(im.naturalHeight * s);
+            const c = document.createElement('canvas'); c.width = w; c.height = h;
+            const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(im, 0, 0, w, h);
+            const data = c.toDataURL('image/jpeg', q);
+            if (data.length <= maxChars) return data;
+            if (q > .6) q -= .08; else side = Math.round(side * .85);
+        }
+        throw new Error('Ảnh quá lớn');
+    };
+    heroInput.addEventListener('change', async () => {
+        const file = heroInput.files[0]; heroInput.value = '';
+        if (!file || !file.type.startsWith('image/')) return;
+        toast('Đang tải ảnh bìa lên…');
+        try {
+            const im = await loadImg(file), photo = compress(im, HERO_SPEC);
+            await saveHero(photo); showHero(photo); toast('Đã cập nhật ảnh bìa 💕');
+        } catch (err) {
+            console.error(err);
+            toast(err?.code === 'permission-denied' ? 'Hãy cập nhật Rules trong README-chat.md (thêm home vào profiles) nha!' : 'Đổi ảnh bìa chưa được, thử lại nha 🥲', 5500);
+        }
+    });
+    const confirmBox = $('confirm-box'), confirmOk = $('confirm-ok'), confirmCancel = $('confirm-cancel'), confirmImg = $('confirm-img');
+    const askConfirm = src => new Promise(resolve => {
+        confirmImg.src = src; confirmBox.hidden = false; confirmCancel.focus();
+        const done = res => { confirmBox.hidden = true; confirmOk.onclick = confirmCancel.onclick = confirmBox.onclick = null; document.removeEventListener('keydown', onKey, true); resolve(res) };
+        const onKey = e => { if (e.key === 'Escape') { e.stopPropagation(); done(false) } };
+        confirmOk.onclick = () => done(true);
+        confirmCancel.onclick = () => done(false);
+        confirmBox.onclick = e => { if (e.target === confirmBox) done(false) };
+        document.addEventListener('keydown', onKey, true);
+    });
+    heroRemove.addEventListener('click', async () => {
+        if (!(await askConfirm(heroImg.src))) return;
+        toast('Đang xóa ảnh bìa…');
+        try { await saveHero(''); showHero(''); toast('Đã xóa ảnh bìa 🗑') }
+        catch (err) { console.error(err); toast('Xóa ảnh chưa được, thử lại nha.') }
+    });
+})();
