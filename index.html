@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BinZin World</title>
     <link rel="icon" type="image/svg+xml" href="assets/icons/love_heart_icon.svg">
-    <link rel="stylesheet" href="styles.css?v=8">
+    <link rel="stylesheet" href="styles.css?v=9">
     <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js" type="text/javascript"></script>
     <!-- Firebase (bản compat) -->
@@ -154,33 +154,39 @@
 
                 <!-- Cột mốc & Đếm ngược ngày kỷ niệm -->
                 <div class="mt-8 grid lg:grid-cols-2 gap-6">
-                    <div class="glass rounded-[30px] p-6 sm:p-7 flex flex-col">
-                        <div class="flex items-center justify-between gap-2">
+                    <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col min-w-0 overflow-hidden">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
                             <h2 class="text-[#713d53]">⏳ Đếm ngược cột mốc sắp tới</h2>
                             <button type="button" id="cd-reset-btn" class="secondary text-xs">Khôi phục mặc định</button>
                         </div>
                         <p class="mt-1 text-sm text-[#876777]">Thêm, sửa, xóa các cột mốc để tự động đếm ngược số ngày 💕</p>
-                        <form id="countdown-form" class="mt-4 grid sm:grid-cols-[54px_1fr_145px_auto] gap-2">
-                            <input id="cd-icon" class="field text-center text-lg !px-1" maxlength="4" value="💖" required aria-label="Biểu tượng">
-                            <input id="cd-title" class="field" maxlength="80" placeholder="Tên cột mốc (VD: 200 ngày iu)…" required>
-                            <input id="cd-date" type="date" class="field" required>
-                            <div class="flex gap-1.5">
-                                <button type="submit" id="cd-submit" class="primary flex-1">Thêm</button>
-                                <button type="button" id="cd-cancel" class="secondary" hidden>Hủy</button>
+                        <form id="countdown-form" class="mt-4 flex flex-col gap-2.5">
+                            <div class="grid grid-cols-[54px_1fr] gap-2">
+                                <input id="cd-icon" class="field text-center text-lg !px-1" maxlength="4" value="💖" required aria-label="Biểu tượng">
+                                <input id="cd-title" class="field" maxlength="80" placeholder="Tên cột mốc (VD: 200 ngày iu)…" required>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+                                <input id="cd-date" type="date" class="field" required>
+                                <div class="flex gap-1.5">
+                                    <button type="submit" id="cd-submit" class="primary flex-1 sm:flex-none">Thêm</button>
+                                    <button type="button" id="cd-cancel" class="secondary" hidden>Hủy</button>
+                                </div>
                             </div>
                         </form>
                         <ul id="auto-milestones" class="mt-5 space-y-3 flex-1"></ul>
                         <p id="cd-empty" class="text-center text-sm text-[#876777] py-6" hidden>Chưa có cột mốc đếm ngược nào. Thêm sự kiện ở trên nha ♡</p>
                     </div>
-                    <div class="glass rounded-[30px] p-6 sm:p-7 flex flex-col">
+                    <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col min-w-0 overflow-hidden">
                         <h2 class="text-[#713d53]">📌 Kỷ niệm riêng của tụi mình</h2>
                         <p class="mt-1 text-sm text-[#876777]">Thêm những ngày đáng nhớ (hẹn hò đầu tiên, chuyến đi chơi, sự kiện sắp tới…)</p>
-                        <form id="milestone-form" class="mt-4 grid sm:grid-cols-[1fr_150px_auto] gap-2">
+                        <form id="milestone-form" class="mt-4 flex flex-col gap-2.5">
                             <input id="ms-title" class="field" maxlength="80" placeholder="VD: Chuyến đi Đà Lạt…" required>
-                            <input id="ms-date" type="date" class="field" required>
-                            <div class="flex gap-1.5">
-                                <button type="submit" id="ms-submit" class="primary flex-1">Thêm</button>
-                                <button type="button" id="ms-cancel" class="secondary" hidden>Hủy</button>
+                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+                                <input id="ms-date" type="date" class="field" required>
+                                <div class="flex gap-1.5">
+                                    <button type="submit" id="ms-submit" class="primary flex-1 sm:flex-none">Thêm</button>
+                                    <button type="button" id="ms-cancel" class="secondary" hidden>Hủy</button>
+                                </div>
                             </div>
                         </form>
                         <ul id="custom-milestones" class="mt-4 space-y-2 flex-1"></ul>
