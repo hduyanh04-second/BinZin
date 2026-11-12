@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BinZin World</title>
     <link rel="icon" type="image/svg+xml" href="assets/icons/love_heart_icon.svg">
-    <link rel="stylesheet" href="styles.css?v=7">
+    <link rel="stylesheet" href="styles.css?v=8">
     <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js" type="text/javascript"></script>
     <!-- Firebase (bản compat) -->
@@ -37,6 +37,8 @@
                         href="letter.html" data-template-id="nav-letter" class="canva-button nav-btn">Đôi lời mún
                         nói</a> <button type="button" data-go="calendar" data-template-id="nav-calendar"
                         class="canva-button nav-btn">Ngày mấy iu nhau 🧐</button> <a href="photos.html" data-template-id="nav-photos" class="canva-button nav-btn">Photographs</a> <button
+                        type="button" data-go="wheel" data-template-id="nav-wheel"
+                        class="canva-button nav-btn">Hôm nay ăn gì 🎡</button> <button
                         type="button" data-go="games" data-template-id="nav-games"
                         class="canva-button nav-btn">Game</button>
                 </nav>
@@ -59,6 +61,27 @@
                                 data-go="calendar" data-template-id="hero-calendar-button"
                                 class="canva-button secondary">Đếm ngày iu ♡</button>
                         </div>
+                        <!-- Trạng thái hôm nay (Mood / Status của Bin & Zin) -->
+                        <div class="mt-7 grid sm:grid-cols-2 gap-3" aria-label="Trạng thái hôm nay của Bin và Zin">
+                            <button type="button" id="mood-btn-bin" data-mood-person="bin"
+                                class="mood-pill glass text-left">
+                                <span class="text-2xl" id="mood-emoji-bin" aria-hidden="true">💭</span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block text-xs font-bold text-[#a84268]">🐻 Bin đang…</span>
+                                    <span id="mood-text-bin" class="block font-semibold text-[#713d53] truncate">Nhớ Zin nhiều lắm 💕</span>
+                                </span>
+                                <span class="text-xs text-[#a84268]">✏️</span>
+                            </button>
+                            <button type="button" id="mood-btn-zin" data-mood-person="zin"
+                                class="mood-pill glass text-left">
+                                <span class="text-2xl" id="mood-emoji-zin" aria-hidden="true">🧋</span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block text-xs font-bold text-[#a84268]">🌷 Zin đang…</span>
+                                    <span id="mood-text-zin" class="block font-semibold text-[#713d53] truncate">Thèm trà sữa cùng Bin</span>
+                                </span>
+                                <span class="text-xs text-[#a84268]">✏️</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="order-1 lg:order-2 mx-auto w-full max-w-[470px]">
                         <div class="relative">
@@ -79,14 +102,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><a href="profile.html" class="glass rounded-3xl p-6 text-left block"><span aria-hidden="true">🧸</span><span
+                <div class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-5"><a href="profile.html" class="glass rounded-3xl p-6 text-left block"><span aria-hidden="true">🧸</span><span
                             data-template-id="shortcut-profile"
                             class="canva-text block mt-3 font-bold">Profile</span></a> <a href="letter.html"
                         class="glass rounded-3xl p-6 text-left block"><span aria-hidden="true">💌</span><span
                             data-template-id="shortcut-letter" class="canva-text block mt-3 font-bold">Đôi lời mún
                             nói</span></a> <a href="photos.html" class="glass rounded-3xl p-6 text-left block"><span aria-hidden="true">📸</span><span
                             data-template-id="shortcut-photos" class="canva-text block mt-3 font-bold">Ảnh kỷ
-                            niệm</span></a> <button type="button" data-go="games"
+                            niệm</span></a> <button type="button" data-go="wheel"
+                        class="glass rounded-3xl p-6 text-left"><span aria-hidden="true">🎡</span><span
+                            class="canva-text block mt-3 font-bold">Hôm nay ăn gì?</span></button> <button type="button" data-go="games"
                         class="glass rounded-3xl p-6 text-left"><span aria-hidden="true">🎲</span><span
                             data-template-id="shortcut-games" class="canva-text block mt-3 font-bold">Chơi cùng
                             nhau</span></button>
@@ -124,6 +149,75 @@
                         <div id="calendar-days" class="calendar-grid mt-3" aria-label="Lịch tháng"></div><button
                             id="today-button" type="button" data-template-id="today-button-text"
                             class="canva-button secondary mt-5">Hôm nay</button>
+                    </div>
+                </div>
+
+                <!-- Cột mốc & Đếm ngược ngày kỷ niệm -->
+                <div class="mt-8 grid lg:grid-cols-2 gap-6">
+                    <div class="glass rounded-[30px] p-6 sm:p-7 flex flex-col">
+                        <div class="flex items-center justify-between gap-2">
+                            <h2 class="text-[#713d53]">⏳ Đếm ngược cột mốc sắp tới</h2>
+                            <button type="button" id="cd-reset-btn" class="secondary text-xs">Khôi phục mặc định</button>
+                        </div>
+                        <p class="mt-1 text-sm text-[#876777]">Thêm, sửa, xóa các cột mốc để tự động đếm ngược số ngày 💕</p>
+                        <form id="countdown-form" class="mt-4 grid sm:grid-cols-[54px_1fr_145px_auto] gap-2">
+                            <input id="cd-icon" class="field text-center text-lg !px-1" maxlength="4" value="💖" required aria-label="Biểu tượng">
+                            <input id="cd-title" class="field" maxlength="80" placeholder="Tên cột mốc (VD: 200 ngày iu)…" required>
+                            <input id="cd-date" type="date" class="field" required>
+                            <div class="flex gap-1.5">
+                                <button type="submit" id="cd-submit" class="primary flex-1">Thêm</button>
+                                <button type="button" id="cd-cancel" class="secondary" hidden>Hủy</button>
+                            </div>
+                        </form>
+                        <ul id="auto-milestones" class="mt-5 space-y-3 flex-1"></ul>
+                        <p id="cd-empty" class="text-center text-sm text-[#876777] py-6" hidden>Chưa có cột mốc đếm ngược nào. Thêm sự kiện ở trên nha ♡</p>
+                    </div>
+                    <div class="glass rounded-[30px] p-6 sm:p-7 flex flex-col">
+                        <h2 class="text-[#713d53]">📌 Kỷ niệm riêng của tụi mình</h2>
+                        <p class="mt-1 text-sm text-[#876777]">Thêm những ngày đáng nhớ (hẹn hò đầu tiên, chuyến đi chơi, sự kiện sắp tới…)</p>
+                        <form id="milestone-form" class="mt-4 grid sm:grid-cols-[1fr_150px_auto] gap-2">
+                            <input id="ms-title" class="field" maxlength="80" placeholder="VD: Chuyến đi Đà Lạt…" required>
+                            <input id="ms-date" type="date" class="field" required>
+                            <div class="flex gap-1.5">
+                                <button type="submit" id="ms-submit" class="primary flex-1">Thêm</button>
+                                <button type="button" id="ms-cancel" class="secondary" hidden>Hủy</button>
+                            </div>
+                        </form>
+                        <ul id="custom-milestones" class="mt-4 space-y-2 flex-1"></ul>
+                        <p id="custom-ms-empty" class="text-center text-sm text-[#876777] py-6" hidden>Chưa có ngày kỷ niệm riêng nào. Thêm cột mốc đầu tiên nha ♡</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vòng quay "Hôm nay ăn gì / Đi đâu?" -->
+            <section id="wheel" class="pane reveal" hidden aria-labelledby="wheel-title">
+                <h1 id="wheel-title" class="text-center text-[#713d53]">Hôm nay ăn gì / Đi đâu? 🎡</h1>
+                <p class="mt-2 text-center text-[#876777]">Để vòng quay quyết định giúp Bin &amp; Zin khỏi phải đau đầu suy nghĩ nha!</p>
+                <div class="mt-6 flex justify-center gap-2" role="tablist" aria-label="Chọn loại vòng quay">
+                    <button type="button" data-wheel-tab="eat" class="pill active font-bold" role="tab" aria-selected="true">🍜 Hôm nay ăn gì?</button>
+                    <button type="button" data-wheel-tab="go" class="pill font-bold" role="tab" aria-selected="false">🛵 Hôm nay đi đâu?</button>
+                </div>
+
+                <div class="mt-8 grid lg:grid-cols-[minmax(0,420px)_1fr] gap-8 items-center">
+                    <div class="glass rounded-[32px] p-6 flex flex-col items-center">
+                        <div class="wheel-stage">
+                            <div class="wheel-pointer" aria-hidden="true">▼</div>
+                            <canvas id="wheel-canvas" width="340" height="340" class="wheel-canvas"></canvas>
+                        </div>
+                        <button type="button" id="wheel-spin" class="primary mt-6 w-full max-w-xs text-lg">🎯 Quay ngay!</button>
+                        <p id="wheel-result" role="status" aria-live="polite" class="mt-4 text-center font-bold text-xl text-[#c85578] min-h-8"></p>
+                    </div>
+
+                    <div class="glass rounded-[32px] p-6 sm:p-7">
+                        <div class="flex items-center justify-between gap-2">
+                            <h2 id="wheel-list-title" class="text-[#713d53]">Danh sách món ăn</h2>
+                            <button type="button" id="wheel-reset-default" class="secondary text-xs">Khôi phục mặc định</button>
+                        </div>
+                        <form id="wheel-add-form" class="mt-4 flex gap-2">
+                            <input id="wheel-item-input" class="field flex-1" maxlength="50" placeholder="Thêm lựa chọn mới…" required>
+                            <button type="submit" class="primary">Thêm</button>
+                        </form>
+                        <ul id="wheel-items" class="mt-4 flex flex-wrap gap-2"></ul>
                     </div>
                 </div>
             </section>
@@ -206,8 +300,25 @@
             </div>
         </div>
     </div>
+    <!-- Hộp chỉnh sửa trạng thái (Mood / Status) -->
+    <div id="mood-modal" class="confirm-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="mood-modal-title">
+        <form id="mood-form" class="confirm-card text-left">
+            <h3 id="mood-modal-title" class="text-[#713d53] text-center">Cập nhật trạng thái</h3>
+            <p class="text-xs text-[#876777] text-center mt-1">Chọn biểu tượng hoặc tự gõ trạng thái hôm nay nha</p>
+            <div id="mood-presets" class="mt-4 flex flex-wrap justify-center gap-1.5"></div>
+            <div class="mt-4 grid grid-cols-[64px_1fr] gap-2">
+                <input id="mood-emoji-input" class="field text-center text-xl" maxlength="4" required aria-label="Emoji">
+                <input id="mood-text-input" class="field" maxlength="60" placeholder="Đang làm gì / nghĩ gì…" required aria-label="Nội dung trạng thái">
+            </div>
+            <div class="mt-5 grid grid-cols-2 gap-3">
+                <button type="button" id="mood-cancel" class="secondary">Hủy</button>
+                <button type="submit" class="primary">Lưu 💕</button>
+            </div>
+        </form>
+    </div>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-    <script src="script.js?v=3"></script>
+    <script src="nav.js?v=4"></script>
+    <script src="script.js?v=6"></script>
 </body>
 
 </html>

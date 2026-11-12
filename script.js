@@ -37,15 +37,8 @@ document.querySelectorAll('[data-go]').forEach(button => button.addEventListener
     const name = button.dataset.go; document.querySelectorAll('.pane').forEach(p => p.hidden = p.id !== name);
     document.querySelectorAll('nav [data-go]').forEach(b => { b.classList.toggle('active', b.dataset.go === name); if (b.dataset.go === name) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current') });
     if (name === 'games' && !visitedGame) { visitedGame = true; newRound(activeGame) } window.scrollTo({ top: 0, behavior: 'smooth' });
-    setMenu(false)
+    window.setMobileMenu?.(false)
 }));
-// Menu điều hướng trên điện thoại
-const menuToggle = document.getElementById('menu-toggle'), mainNav = document.getElementById('main-nav');
-function setMenu(open) { if (!menuToggle || !mainNav) return; mainNav.classList.toggle('open', open); menuToggle.setAttribute('aria-expanded', String(open)); menuToggle.setAttribute('aria-label', open ? 'Đóng menu' : 'Mở menu') }
-menuToggle?.addEventListener('click', () => setMenu(!mainNav.classList.contains('open')));
-document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false) });
-document.addEventListener('click', e => { if (mainNav?.classList.contains('open') && !mainNav.contains(e.target) && !menuToggle.contains(e.target)) setMenu(false) });
-window.matchMedia('(min-width:768px)').addEventListener('change', e => { if (e.matches) setMenu(false) });
 // Mở đúng mục khi đến từ trang khác (vd: letter.html -> index.html#calendar)
 window.addEventListener('load', () => { const target = location.hash.slice(1); if (target && document.getElementById(target)?.classList.contains('pane')) document.querySelector(`nav [data-go="${target}"]`)?.click() });
 let shownYear = new Date().getFullYear(), shownMonth = new Date().getMonth();
@@ -139,4 +132,506 @@ $('chess-reset').onclick = resetChess; resetChess();
         try { await saveHero(''); showHero(''); toast('Đã xóa ảnh bìa 🗑') }
         catch (err) { console.error(err); toast('Xóa ảnh chưa được, thử lại nha.') }
     });
+
+    // ===== 1. Trạng thái hôm nay (Mood / Status ở trang Home — lưu vào profiles/mood) =====
+    const MOOD_KEY = 'binzin-mood-v1';
+    const PRESETS = [
+        ['💭', 'Nhớ người iu quá chừng'],
+        ['🧋', 'Thèm trà sữa cùng nhau'],
+        ['🍜', 'Đói bụng rồi, đi ăn thui'],
+        ['💻', 'Đang chạy deadline chăm chỉ'],
+        ['😴', 'Buồn ngủ díp mắt'],
+        ['🎮', 'Muốn rủ người iu chơi game'],
+        ['🥰', 'Đang rất vui và iu đời'],
+        ['🥺', 'Cần một cái ôm ngay bây giờ']
+    ];
+    let moodState = { binEmoji: '💭', binText: 'Nhớ Zin nhiều lắm 💕', zinEmoji: '🧋', zinText: 'Thèm trà sữa cùng Bin', countdownEvents: null, customMilestones: '', wheelEat: '', wheelGo: '' };
+    let activeMoodPerson = 'bin', saveMoodDoc;
+
+    function renderMood() {
+        $('mood-emoji-bin').textContent = moodState.binEmoji || '💭';
+        $('mood-text-bin').textContent = moodState.binText || 'Nhớ Zin nhiều lắm 💕';
+        $('mood-emoji-zin').textContent = moodState.zinEmoji || '🧋';
+        $('mood-text-zin').textContent = moodState.zinText || 'Thèm trà sữa cùng Bin';
+    }
+
+    const serializeState = s => JSON.stringify({
+        binEmoji: s.binEmoji, binText: s.binText, zinEmoji: s.zinEmoji, zinText: s.zinText,
+        countdownEvents: s.countdownEvents, customMilestones: s.customMilestones, wheelEat: s.wheelEat, wheelGo: s.wheelGo
+    });
+
+    if (firebaseReady) {
+        const moodRef = firebase.firestore().collection('profiles').doc('mood');
+        moodRef.onSnapshot(snap => {
+            if (snap.exists) {
+                const d = snap.data();
+                try {
+                    const parsed = JSON.parse(d.about || '{}');
+                    moodState = { ...moodState, ...parsed };
+                } catch { }
+                renderMood();
+                renderMilestones();
+                syncWheelFromRemote();
+            }
+        }, err => console.error(err));
+        saveMoodDoc = async patch => {
+            moodState = { ...moodState, ...patch };
+            localStorage.setItem(MOOD_KEY, serializeState(moodState));
+            await moodRef.set({
+                name: 'AppState',
+                bio: `${moodState.binEmoji} ${moodState.binText}`.slice(0, 150),
+                about: serializeState(moodState).slice(0, 1490),
+                likes: '',
+                photo: '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        };
+    } else {
+        try { moodState = { ...moodState, ...JSON.parse(localStorage.getItem(MOOD_KEY) || '{}') } } catch { }
+        saveMoodDoc = async patch => {
+            moodState = { ...moodState, ...patch };
+            localStorage.setItem(MOOD_KEY, serializeState(moodState));
+        };
+    }
+
+    const moodModal = $('mood-modal'), moodForm = $('mood-form'), presetsEl = $('mood-presets');
+    PRESETS.forEach(([em, txt]) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'secondary text-xs !py-1.5 !px-2.5';
+        b.textContent = `${em} ${txt}`;
+        b.addEventListener('click', () => { $('mood-emoji-input').value = em; $('mood-text-input').value = txt });
+        presetsEl.append(b);
+    });
+
+    document.querySelectorAll('[data-mood-person]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            activeMoodPerson = btn.dataset.moodPerson;
+            $('mood-modal-title').textContent = activeMoodPerson === 'bin' ? '🐻 Trạng thái của Bin' : '🌷 Trạng thái của Zin';
+            $('mood-emoji-input').value = activeMoodPerson === 'bin' ? moodState.binEmoji : moodState.zinEmoji;
+            $('mood-text-input').value = activeMoodPerson === 'bin' ? moodState.binText : moodState.zinText;
+            moodModal.hidden = false;
+            $('mood-text-input').focus();
+        });
+    });
+    $('mood-cancel').addEventListener('click', () => { moodModal.hidden = true });
+    moodModal.addEventListener('click', e => { if (e.target === moodModal) moodModal.hidden = true });
+    moodForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        const em = $('mood-emoji-input').value.trim() || '💕';
+        const txt = $('mood-text-input').value.trim();
+        if (!txt) return;
+        const patch = activeMoodPerson === 'bin' ? { binEmoji: em, binText: txt } : { zinEmoji: em, zinText: txt };
+        moodModal.hidden = true;
+        renderMood();
+        try { await saveMoodDoc(patch); renderMood(); toast('Đã cập nhật trạng thái 💕') }
+        catch (err) { console.error(err); toast('Lưu trạng thái chưa được, thử lại nha.') }
+    });
+    renderMood();
+
+    // ===== 2. Cột mốc & Đếm ngược ngày kỷ niệm (CRUD đầy đủ cho cả 2 bảng) =====
+    const autoListEl = $('auto-milestones'), cdEmptyEl = $('cd-empty'), customListEl = $('custom-milestones'), customEmptyEl = $('custom-ms-empty');
+    const DAY_MS = 86400000;
+    const fmtVN = d => d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const toISODate = u => new Date(u).toISOString().slice(0, 10);
+
+    function buildDefaultCountdowns() {
+        const now = new Date();
+        const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+        const startUTC = Date.UTC(2026, 6, 4); // 04/07/2026
+        const currentDays = Math.round((todayUTC - startUTC) / DAY_MS) + 1;
+        const list = [];
+        const dayTargets = [50, 100, 150, 200, 250, 300, 365, 500, 730, 1000, 1500, 2000];
+        for (const n of dayTargets) {
+            if (n >= currentDays && list.length < 3) {
+                const targetUTC = startUTC + (n - 1) * DAY_MS;
+                list.push(`💖|${toISODate(targetUTC)}|Kỷ niệm ${n} ngày yêu nhau`);
+            }
+        }
+        let annivYear = now.getFullYear();
+        let annivUTC = Date.UTC(annivYear, 6, 4);
+        if (annivUTC < todayUTC || annivYear <= 2026) { annivYear = Math.max(2027, annivYear + 1); annivUTC = Date.UTC(annivYear, 6, 4) }
+        list.push(`💍|${toISODate(annivUTC)}|Kỷ niệm ${annivYear - 2026} năm bên nhau`);
+
+        const nextAnnual = (mIdx, day) => {
+            let y = now.getFullYear(), u = Date.UTC(y, mIdx, day);
+            if (u < todayUTC) { y++; u = Date.UTC(y, mIdx, day) }
+            return toISODate(u);
+        };
+        list.push(`🎂|${nextAnnual(0, 31)}|Sinh nhật Bin 🧸 (31/01)`);
+        list.push(`🎂|${nextAnnual(8, 8)}|Sinh nhật Zin 🌷 (08/09)`);
+        return list.join('\n');
+    }
+
+    function getCountdownEvents() {
+        const raw = moodState.countdownEvents === null || moodState.countdownEvents === undefined
+            ? buildDefaultCountdowns()
+            : moodState.countdownEvents;
+        if (!raw) return [];
+        return raw.split('\n').filter(Boolean).map((line, idx) => {
+            const parts = line.split('|');
+            if (parts.length >= 3) {
+                const [icon, dateStr, ...rest] = parts;
+                return { idx, icon: icon || '💖', dateStr, title: rest.join('|') };
+            }
+            const [dateStr, ...rest] = parts;
+            return { idx, icon: '💖', dateStr, title: rest.join('|') };
+        }).filter(x => x.dateStr && x.title);
+    }
+
+    function getCustomMilestones() {
+        if (!moodState.customMilestones) return [];
+        return moodState.customMilestones.split('\n').filter(Boolean).map((line, idx) => {
+            const [dateStr, ...rest] = line.split('|');
+            return { idx, dateStr, title: rest.join('|') };
+        }).filter(x => x.dateStr && x.title);
+    }
+
+    let editingCdIdx = -1, editingMsIdx = -1;
+
+    function setCdEditing(item) {
+        if (item) {
+            editingCdIdx = item.idx;
+            $('cd-icon').value = item.icon || '💖';
+            $('cd-title').value = item.title;
+            $('cd-date').value = item.dateStr;
+            $('cd-submit').textContent = 'Lưu';
+            $('cd-cancel').hidden = false;
+            $('cd-title').focus();
+        } else {
+            editingCdIdx = -1;
+            $('cd-icon').value = '💖';
+            $('cd-title').value = '';
+            $('cd-date').value = '';
+            $('cd-submit').textContent = 'Thêm';
+            $('cd-cancel').hidden = true;
+        }
+    }
+
+    function setMsEditing(item) {
+        if (item) {
+            editingMsIdx = item.idx;
+            $('ms-title').value = item.title;
+            $('ms-date').value = item.dateStr;
+            $('ms-submit').textContent = 'Lưu';
+            $('ms-cancel').hidden = false;
+            $('ms-title').focus();
+        } else {
+            editingMsIdx = -1;
+            $('ms-title').value = '';
+            $('ms-date').value = '';
+            $('ms-submit').textContent = 'Thêm';
+            $('ms-cancel').hidden = true;
+        }
+    }
+
+    function renderMilestones() {
+        if (!autoListEl) return;
+        const now = new Date();
+        const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+
+        // Bảng 1: Đếm ngược cột mốc sắp tới (CRUD)
+        const cdItems = getCountdownEvents().map(it => {
+            const [y, m, d] = it.dateStr.split('-').map(Number);
+            const u = Date.UTC(y, m - 1, d);
+            return { ...it, date: new Date(u), diff: Math.round((u - todayUTC) / DAY_MS) };
+        });
+        cdItems.sort((a, b) => a.diff - b.diff);
+        autoListEl.replaceChildren();
+        cdItems.forEach(it => {
+            const li = document.createElement('li');
+            li.className = 'milestone-item';
+            const badgeText = it.diff === 0 ? '🎉 Hôm nay!' : it.diff > 0 ? `Còn ${it.diff} ngày` : `${Math.abs(it.diff)} ngày trước`;
+
+            const iconEl = document.createElement('span');
+            iconEl.className = 'text-2xl';
+            iconEl.setAttribute('aria-hidden', 'true');
+            iconEl.textContent = it.icon;
+
+            const info = document.createElement('div');
+            info.className = 'min-w-0 flex-1';
+            const t = document.createElement('p'); t.className = 'font-bold text-[#713d53]'; t.textContent = it.title;
+            const sub = document.createElement('p'); sub.className = 'text-xs text-[#876777]'; sub.textContent = fmtVN(it.date);
+            info.append(t, sub);
+
+            const badge = document.createElement('span');
+            badge.className = 'milestone-badge';
+            badge.textContent = badgeText;
+
+            const actions = document.createElement('div');
+            actions.className = 'flex gap-1';
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'secondary text-xs !py-1 !px-2';
+            editBtn.textContent = '✏️';
+            editBtn.setAttribute('aria-label', 'Sửa ' + it.title);
+            editBtn.addEventListener('click', () => setCdEditing(it));
+
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'secondary text-xs !py-1 !px-2';
+            delBtn.textContent = '✕';
+            delBtn.setAttribute('aria-label', 'Xóa ' + it.title);
+            delBtn.addEventListener('click', async () => {
+                const next = getCountdownEvents().filter(x => x.idx !== it.idx).map(x => `${x.icon}|${x.dateStr}|${x.title}`).join('\n');
+                if (editingCdIdx === it.idx) setCdEditing(null);
+                await saveMoodDoc({ countdownEvents: next });
+                renderMilestones();
+                toast('Đã xóa cột mốc.');
+            });
+            actions.append(editBtn, delBtn);
+
+            li.append(iconEl, info, badge, actions);
+            autoListEl.append(li);
+        });
+        if (cdEmptyEl) cdEmptyEl.hidden = cdItems.length > 0;
+
+        // Bảng 2: Danh sách kỷ niệm riêng (CRUD)
+        const customs = getCustomMilestones();
+        customListEl.replaceChildren();
+        customs.forEach(c => {
+            const [y, m, d] = c.dateStr.split('-').map(Number);
+            const u = Date.UTC(y, m - 1, d);
+            const diff = Math.round((u - todayUTC) / DAY_MS);
+            const label = diff === 0 ? '🎉 Hôm nay!' : diff > 0 ? `Còn ${diff} ngày` : `${Math.abs(diff)} ngày trước`;
+            const li = document.createElement('li');
+            li.className = 'milestone-item';
+            const info = document.createElement('div');
+            info.className = 'min-w-0 flex-1';
+            const t = document.createElement('p'); t.className = 'font-bold text-[#713d53]'; t.textContent = `📌 ${c.title}`;
+            const sub = document.createElement('p'); sub.className = 'text-xs text-[#876777]'; sub.textContent = fmtVN(new Date(u));
+            info.append(t, sub);
+
+            const badge = document.createElement('span');
+            badge.className = 'milestone-badge';
+            badge.textContent = label;
+
+            const actions = document.createElement('div');
+            actions.className = 'flex gap-1';
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'secondary text-xs !py-1 !px-2';
+            editBtn.textContent = '✏️';
+            editBtn.setAttribute('aria-label', 'Sửa ' + c.title);
+            editBtn.addEventListener('click', () => setMsEditing(c));
+
+            const del = document.createElement('button');
+            del.type = 'button';
+            del.className = 'secondary text-xs !py-1 !px-2';
+            del.textContent = '✕';
+            del.setAttribute('aria-label', 'Xóa cột mốc');
+            del.addEventListener('click', async () => {
+                const next = getCustomMilestones().filter(x => x.idx !== c.idx).map(x => `${x.dateStr}|${x.title}`).join('\n');
+                if (editingMsIdx === c.idx) setMsEditing(null);
+                await saveMoodDoc({ customMilestones: next });
+                renderMilestones();
+                toast('Đã xóa kỷ niệm.');
+            });
+            actions.append(editBtn, del);
+            li.append(info, badge, actions);
+            customListEl.append(li);
+        });
+        customEmptyEl.hidden = customs.length > 0;
+    }
+
+    $('cd-cancel')?.addEventListener('click', () => setCdEditing(null));
+    $('countdown-form')?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const icon = ($('cd-icon').value.trim() || '💖').replace(/\|/g, '');
+        const title = $('cd-title').value.trim().replace(/\|/g, '-');
+        const dateStr = $('cd-date').value;
+        if (!title || !dateStr) return;
+        const current = getCountdownEvents();
+        if (editingCdIdx >= 0) {
+            const target = current.find(x => x.idx === editingCdIdx);
+            if (target) { target.icon = icon; target.title = title; target.dateStr = dateStr }
+        } else {
+            current.push({ icon, dateStr, title });
+        }
+        setCdEditing(null);
+        await saveMoodDoc({ countdownEvents: current.map(x => `${x.icon}|${x.dateStr}|${x.title}`).join('\n') });
+        renderMilestones();
+        toast('Đã lưu cột mốc đếm ngược 💕');
+    });
+
+    $('cd-reset-btn')?.addEventListener('click', async () => {
+        setCdEditing(null);
+        await saveMoodDoc({ countdownEvents: buildDefaultCountdowns() });
+        renderMilestones();
+        toast('Đã khôi phục các cột mốc mặc định.');
+    });
+
+    $('ms-cancel')?.addEventListener('click', () => setMsEditing(null));
+    $('milestone-form')?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const title = $('ms-title').value.trim().replace(/\|/g, '-');
+        const dateStr = $('ms-date').value;
+        if (!title || !dateStr) return;
+        const current = getCustomMilestones();
+        if (editingMsIdx >= 0) {
+            const target = current.find(x => x.idx === editingMsIdx);
+            if (target) { target.title = title; target.dateStr = dateStr }
+        } else {
+            current.push({ dateStr, title });
+        }
+        setMsEditing(null);
+        await saveMoodDoc({ customMilestones: current.map(x => `${x.dateStr}|${x.title}`).join('\n') });
+        renderMilestones();
+        toast('Đã lưu ngày kỷ niệm 💕');
+    });
+    renderMilestones();
+
+    // ===== 3. Vòng quay "Hôm nay ăn gì / Đi đâu?" =====
+    const DEFAULT_WHEEL = {
+        eat: ['Lẩu thái chua cay 🍲', 'Đồ nướng BBQ 🥩', 'Mì cay 7 cấp độ 🌶️', 'Sushi & Sashimi 🍣', 'Bún đậu mắm tôm 🥢', 'Pizza & Mì Ý 🍕', 'Gà rán + Trà sữa 🍗', 'Phở bò / Bún bò 🍜'],
+        go: ['Đi dạo phố & uống trà sữa 🧋', 'Đi xem phim rạp 🍿', 'Chụp Photobooth Hàn Quốc 📸', 'Đi cafe học bài / làm việc ☕', 'Đi siêu thị nấu ăn cùng nhau 🛒', 'Đi công viên hóng gió 🌿', 'Ở nhà cày phim & ôm nhau 🛋️', 'Đi khu vui chơi / gắp thú 🧸']
+    };
+    const WHEEL_COLORS = ['#f8d5df', '#ffe7ed', '#fbdce5', '#f3b6c8', '#fff0e9', '#efd8df', '#f6c8d6', '#ffe1e9'];
+    let wheelTab = 'eat', spinning = false, wheelAngle = 0;
+    let wheelData = { eat: [...DEFAULT_WHEEL.eat], go: [...DEFAULT_WHEEL.go] };
+
+    function syncWheelFromRemote() {
+        if (moodState.wheelEat) wheelData.eat = moodState.wheelEat.split('|').filter(Boolean);
+        if (moodState.wheelGo) wheelData.go = moodState.wheelGo.split('|').filter(Boolean);
+        renderWheel();
+    }
+    syncWheelFromRemote();
+
+    function saveWheelList() {
+        return saveMoodDoc({
+            wheelEat: wheelData.eat.join('|'),
+            wheelGo: wheelData.go.join('|')
+        });
+    }
+
+    function drawWheel() {
+        const canvas = $('wheel-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const items = wheelData[wheelTab];
+        const cx = canvas.width / 2, cy = canvas.height / 2, r = cx - 8;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (!items.length) return;
+        const arc = (Math.PI * 2) / items.length;
+        items.forEach((label, i) => {
+            const start = wheelAngle + i * arc, end = start + arc;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, r, start, end);
+            ctx.closePath();
+            ctx.fillStyle = WHEEL_COLORS[i % WHEEL_COLORS.length];
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(start + arc / 2);
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#673d50';
+            ctx.font = 'bold 13px "DM Sans", sans-serif';
+            const short = label.length > 18 ? label.slice(0, 17) + '…' : label;
+            ctx.fillText(short, r - 14, 4);
+            ctx.restore();
+        });
+        // Tâm vòng quay
+        ctx.beginPath();
+        ctx.arc(cx, cy, 22, 0, Math.PI * 2);
+        ctx.fillStyle = '#c85578';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+    }
+
+    function renderWheel() {
+        $('wheel-list-title').textContent = wheelTab === 'eat' ? 'Danh sách món ăn 🍜' : 'Danh sách địa điểm 🛵';
+        const ul = $('wheel-items');
+        if (!ul) return;
+        ul.replaceChildren();
+        wheelData[wheelTab].forEach((item, idx) => {
+            const li = document.createElement('li');
+            li.className = 'wheel-chip';
+            const span = document.createElement('span');
+            span.textContent = item;
+            const del = document.createElement('button');
+            del.type = 'button';
+            del.textContent = '✕';
+            del.setAttribute('aria-label', 'Xóa ' + item);
+            del.addEventListener('click', () => {
+                if (wheelData[wheelTab].length <= 2) { toast('Cần giữ ít nhất 2 lựa chọn để quay nha!'); return }
+                wheelData[wheelTab].splice(idx, 1);
+                saveWheelList();
+                renderWheel();
+            });
+            li.append(span, del);
+            ul.append(li);
+        });
+        drawWheel();
+    }
+
+    document.querySelectorAll('[data-wheel-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (spinning) return;
+            wheelTab = btn.dataset.wheelTab;
+            document.querySelectorAll('[data-wheel-tab]').forEach(b => {
+                const active = b === btn;
+                b.classList.toggle('active', active);
+                b.setAttribute('aria-selected', String(active));
+            });
+            $('wheel-result').textContent = '';
+            renderWheel();
+        });
+    });
+
+    $('wheel-add-form')?.addEventListener('submit', e => {
+        e.preventDefault();
+        const val = $('wheel-item-input').value.trim().replace(/\|/g, '-');
+        if (!val) return;
+        wheelData[wheelTab].push(val);
+        $('wheel-item-input').value = '';
+        saveWheelList();
+        renderWheel();
+    });
+
+    $('wheel-reset-default')?.addEventListener('click', () => {
+        wheelData[wheelTab] = [...DEFAULT_WHEEL[wheelTab]];
+        saveWheelList();
+        renderWheel();
+        toast('Đã khôi phục danh sách mặc định.');
+    });
+
+    $('wheel-spin')?.addEventListener('click', () => {
+        const items = wheelData[wheelTab];
+        if (spinning || items.length < 2) return;
+        spinning = true;
+        $('wheel-spin').disabled = true;
+        $('wheel-result').textContent = 'Đang quay… 🎡';
+
+        const extraSpins = (5 + Math.random() * 4) * Math.PI * 2;
+        const startAngle = wheelAngle;
+        const targetAngle = startAngle + extraSpins;
+        const duration = 3400;
+        const t0 = performance.now();
+
+        function frame(now) {
+            const p = Math.min(1, (now - t0) / duration);
+            const ease = 1 - Math.pow(1 - p, 3);
+            wheelAngle = startAngle + (targetAngle - startAngle) * ease;
+            drawWheel();
+            if (p < 1) requestAnimationFrame(frame);
+            else {
+                spinning = false;
+                $('wheel-spin').disabled = false;
+                const arc = (Math.PI * 2) / items.length;
+                // Mũi tên ở góc trên cùng (-PI/2)
+                const norm = ((-Math.PI / 2 - wheelAngle) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                const winIdx = Math.floor(norm / arc) % items.length;
+                $('wheel-result').textContent = `🎉 Chốt đơn: ${items[winIdx]}!`;
+            }
+        }
+        requestAnimationFrame(frame);
+    });
+    renderWheel();
 })();
