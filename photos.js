@@ -4,7 +4,8 @@
 //   photoData/{id}  -> ảnh lớn (~1600px), chỉ tải khi mở xem
 const { toast, loadImage, compressImage: compress, firebaseReady } = window.BinZin;
 const NAME_KEY = 'binzin-chat-name';        // dùng chung lựa chọn Bin/Zin với trang chat
-const PAGE_SIZE = 48;
+const CACHE_KEY = 'binzin-photos-cache';
+const PAGE_SIZE = 20;
 const FULL = { maxSide: 1600, quality: .85, maxChars: 900000 };   // < 1MB / document Firestore
 const THUMB = { maxSide: 480, quality: .72, maxChars: 150000 };
 
@@ -21,8 +22,16 @@ const savedName = localStorage.getItem(NAME_KEY);
 uploaderRadios.forEach(r => { r.checked = r.value === savedName; r.addEventListener('change', () => localStorage.setItem(NAME_KEY, r.value)) });
 const uploader = () => uploaderRadios.find(r => r.checked)?.value || '';
 
-// ---------- Firebase ----------
+// ---------- Firebase + Cache tức thì ----------
 let db, photosCol, dataCol;
+try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
+    if (cached.length) {
+        photos = cached.map(p => ({ ...p, createdAt: new Date(p.createdAt) }));
+        renderGallery();
+    }
+} catch { }
+
 if (firebaseReady) {
     db = firebase.firestore(); photosCol = db.collection('photos'); dataCol = db.collection('photoData');
     subscribe();
@@ -38,6 +47,9 @@ function subscribe() {
             const d = doc.data({ serverTimestamps: 'estimate' });
             return { id: doc.id, thumb: d.thumb, caption: d.caption || '', uploader: d.uploader || '', createdAt: d.createdAt ? d.createdAt.toDate() : new Date() };
         });
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(photos.slice(0, 12).map(p => ({ ...p, createdAt: p.createdAt.toISOString() }))));
+        } catch { }
         loadMoreBtn.hidden = snap.size < limitCount;
         renderGallery();
         if (lbIndex >= 0) { lbIndex = photos.findIndex(p => p.id === lbId); lbIndex >= 0 ? showLightbox(lbIndex) : closeLightbox() }
@@ -49,12 +61,12 @@ loadMoreBtn.addEventListener('click', () => { limitCount += PAGE_SIZE; subscribe
 const fmtDate = d => d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
 function renderGallery() {
-    gallery.replaceChildren();
+    const frag = document.createDocumentFragment();
     photos.forEach((p, i) => {
         const li = document.createElement('li'); li.className = 'photo-card';
         const open = document.createElement('button'); open.type = 'button'; open.className = 'photo-open';
         open.setAttribute('aria-label', 'Xem ảnh' + (p.caption ? ': ' + p.caption : ''));
-        const img = document.createElement('img'); img.src = p.thumb; img.alt = p.caption || 'Ảnh kỷ niệm'; img.loading = 'lazy';
+        const img = document.createElement('img'); img.src = p.thumb; img.alt = p.caption || 'Ảnh kỷ niệm'; img.loading = 'lazy'; img.decoding = 'async';
         open.append(img); open.addEventListener('click', () => showLightbox(i));
         const del = document.createElement('button'); del.type = 'button'; del.className = 'photo-delete'; del.textContent = '🗑';
         del.setAttribute('aria-label', 'Xóa ảnh'); del.addEventListener('click', () => deletePhoto(p));
@@ -63,8 +75,9 @@ function renderGallery() {
         const meta = document.createElement('p'); meta.className = 'text-xs text-[#876777]';
         meta.textContent = (p.uploader ? (p.uploader === 'Bin' ? '🐻 ' : p.uploader === 'Zin' ? '🐰 ' : '') + p.uploader + ' · ' : '') + fmtDate(p.createdAt);
         cap.append(meta);
-        li.append(open, del, cap); gallery.append(li);
+        li.append(open, del, cap); frag.append(li);
     });
+    gallery.replaceChildren(frag);
     emptyEl.hidden = photos.length > 0;
     countEl.textContent = photos.length ? `${photos.length}${loadMoreBtn.hidden ? '' : '+'} ảnh` : '';
 }

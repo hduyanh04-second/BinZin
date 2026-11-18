@@ -857,7 +857,8 @@ input[type="date"].field {
 .floating-petal {
     position: absolute;
     top: -30px;
-    opacity: .55;
+    opacity: .5;
+    will-change: transform;
     animation: petalFall linear infinite
 }
 

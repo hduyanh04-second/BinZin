@@ -84,8 +84,14 @@ document.querySelectorAll('[data-person]').forEach(btn => {
 editBtn.addEventListener('click', () => setEditing(true));
 $('cancel-btn').addEventListener('click', () => setEditing(false));
 
-// ---------- Kết nối Firebase ----------
+// ---------- Kết nối Firebase + Cache cục bộ hiển thị tức thì ----------
 let saveProfile;
+try {
+    const saved = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
+    if (saved.bin) profiles.bin = { ...DEFAULTS.bin, ...saved.bin };
+    if (saved.zin) profiles.zin = { ...DEFAULTS.zin, ...saved.zin };
+} catch { }
+const cacheProfiles = () => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(profiles)) } catch { } };
 
 if (firebaseReady) {
     const col = firebase.firestore().collection('profiles');
@@ -100,6 +106,7 @@ if (firebaseReady) {
                     likes: d.likes ?? DEFAULTS[key].likes,
                     photo: d.photo ?? ''
                 };
+                cacheProfiles();
                 if (key === activePerson) render();
             }
         }, err => {
@@ -111,16 +118,15 @@ if (firebaseReady) {
     });
     saveProfile = async (key, data) => {
         const next = { ...profiles[key], ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+        profiles[key] = { ...profiles[key], ...data };
+        cacheProfiles();
         await col.doc(key).set(next);
     };
 } else {
     statusEl.textContent = 'Chưa cấu hình Firebase — thay đổi đang tạm lưu trên máy này.';
-    const saved = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
-    if (saved.bin) profiles.bin = { ...DEFAULTS.bin, ...saved.bin };
-    if (saved.zin) profiles.zin = { ...DEFAULTS.zin, ...saved.zin };
     saveProfile = async (key, data) => {
         profiles[key] = { ...profiles[key], ...data };
-        localStorage.setItem(LOCAL_KEY, JSON.stringify(profiles));
+        cacheProfiles();
         render();
     };
 }

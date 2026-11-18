@@ -12,13 +12,22 @@
         else { heroImg.removeAttribute('src'); heroImg.hidden = true; heroPlaceholder.hidden = false; heroRemove.hidden = true }
     };
 
+    // Hiển thị ngay ảnh bìa đã cache để chuyển trang mượt mà không chớp trắng
+    try { showHero(localStorage.getItem(HERO_KEY) || '') } catch { showHero('') }
+
     let saveHero;
     if (firebaseReady) {
         const docRef = firebase.firestore().collection('profiles').doc('home');
-        docRef.onSnapshot(snap => { showHero(snap.exists ? (snap.data().photo || '') : '') }, err => console.error(err));
-        saveHero = photo => docRef.set({ name: 'Home', bio: '', about: '', likes: '', photo, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        docRef.onSnapshot(snap => {
+            const photo = snap.exists ? (snap.data().photo || '') : '';
+            try { if (photo) localStorage.setItem(HERO_KEY, photo); else localStorage.removeItem(HERO_KEY) } catch { }
+            showHero(photo);
+        }, err => console.error(err));
+        saveHero = async photo => {
+            try { if (photo) localStorage.setItem(HERO_KEY, photo); else localStorage.removeItem(HERO_KEY) } catch { }
+            await docRef.set({ name: 'Home', bio: '', about: '', likes: '', photo, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        };
     } else {
-        showHero(localStorage.getItem(HERO_KEY) || '');
         saveHero = async photo => {
             if (photo) localStorage.setItem(HERO_KEY, photo); else localStorage.removeItem(HERO_KEY);
             showHero(photo);

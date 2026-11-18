@@ -4,6 +4,10 @@
     const LOCAL_KEY = 'binzin-gym-v1';
     const DAY_ORDER = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
     const DAY_LABELS = { T2: 'Thứ 2', T3: 'Thứ 3', T4: 'Thứ 4', T5: 'Thứ 5', T6: 'Thứ 6', T7: 'Thứ 7', CN: 'Chủ Nhật' };
+    const SESSION_ORDER = ['1', '2', '3', '4', '5'];
+    const SESSION_LABELS = { '1': 'Buổi 1', '2': 'Buổi 2', '3': 'Buổi 3', '4': 'Buổi 4', '5': 'Buổi 5' };
+    const LEGACY_SESSION = { T2: '1', T3: '2', T4: '3', T5: '4', T6: '5', T7: '5', CN: '5' };
+    const normalizeSession = v => SESSION_LABELS[v] ? v : (LEGACY_SESSION[v] || '1');
 
     const DEFAULT_GYM = {
         bin: {
@@ -14,10 +18,10 @@
                 { id: 'g2', title: 'Đẩy ngực (Bench Press) chạm mốc mới', target: '70kg x 5 reps', done: false }
             ],
             schedule: [
-                { id: 's1', day: 'T2', focus: 'Ngực + Tay sau (Push)', note: 'Bench Press, Incline Dumbbell, Dips' },
-                { id: 's2', day: 'T3', focus: 'Lưng + Tay trước (Pull)', note: 'Lat Pulldown, Barbell Row, Bicep Curl' },
-                { id: 's3', day: 'T5', focus: 'Chân + Vai (Legs & Shoulders)', note: 'Squat, RDL, Overhead Press' },
-                { id: 's4', day: 'T7', focus: 'Fullbody + Cardio cùng Zin', note: 'Chạy bộ 20p + Gập bụng' }
+                { id: 's1', day: '1', focus: 'Ngực + Tay sau (Push)', note: 'Bench Press, Incline Dumbbell, Dips' },
+                { id: 's2', day: '2', focus: 'Lưng + Tay trước (Pull)', note: 'Lat Pulldown, Barbell Row, Bicep Curl' },
+                { id: 's3', day: '3', focus: 'Chân + Vai (Legs & Shoulders)', note: 'Squat, RDL, Overhead Press' },
+                { id: 's4', day: '4', focus: 'Fullbody + Cardio cùng Zin', note: 'Chạy bộ 20p + Gập bụng' }
             ],
             prs: [
                 { id: 'p1', exercise: 'Squat', record: '80kg × 5 lần', date: todayISO() },
@@ -33,10 +37,10 @@
                 { id: 'z2', title: 'Giữ eo thon & dáng xinh', target: 'Plank 2 phút mỗi buổi', done: false }
             ],
             schedule: [
-                { id: 'zs1', day: 'T2', focus: 'Mông + Đùi sau (Glutes & Hamstrings)', note: 'Hip Thrust, RDL, Kickback' },
-                { id: 'zs2', day: 'T4', focus: 'Lưng + Tay thon + Bụng', note: 'Seated Row, Plank, Crunch' },
-                { id: 'zs3', day: 'T6', focus: 'Thân dưới (Squat & Lunges)', note: 'Goblet Squat, Bulgarian Split Squat' },
-                { id: 'zs4', day: 'T7', focus: 'Cardio + Giãn cơ cùng Bin', note: 'Đi bộ dốc 25p + Stretching' }
+                { id: 'zs1', day: '1', focus: 'Mông + Đùi sau (Glutes & Hamstrings)', note: 'Hip Thrust, RDL, Kickback' },
+                { id: 'zs2', day: '2', focus: 'Lưng + Tay thon + Bụng', note: 'Seated Row, Plank, Crunch' },
+                { id: 'zs3', day: '3', focus: 'Thân dưới (Squat & Lunges)', note: 'Goblet Squat, Bulgarian Split Squat' },
+                { id: 'zs4', day: '4', focus: 'Cardio + Giãn cơ cùng Bin', note: 'Đi bộ dốc 25p + Stretching' }
             ],
             prs: [
                 { id: 'zp1', exercise: 'Hip Thrust', record: '50kg × 10 lần', date: todayISO() },
@@ -73,6 +77,14 @@
         }
     }
 
+    // Đọc cache cục bộ ngay lập tức để không bị giật lag khi mở trang
+    try {
+        const local = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
+        if (local.bin) state.bin = parseDoc('bin', JSON.stringify(local.bin));
+        if (local.zin) state.zin = parseDoc('zin', JSON.stringify(local.zin));
+    } catch { }
+    const saveLocalCache = () => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(state)) } catch { } };
+
     if (firebaseReady) {
         const col = firebase.firestore().collection('profiles');
         ['bin', 'zin'].forEach(key => {
@@ -80,6 +92,7 @@
                 if (snap.exists) {
                     const d = snap.data();
                     state[key] = parseDoc(key, (d.about || '') + (d.likes || ''));
+                    saveLocalCache();
                     renderAll();
                 }
             }, err => {
@@ -91,6 +104,7 @@
         });
 
         savePersonGym = async key => {
+            saveLocalCache();
             const json = JSON.stringify(state[key]);
             // Chia vào about (<=1500) + likes (<=1000) để tận dụng tối đa 2500 ký tự của schema profiles
             const part1 = json.slice(0, 1480);
@@ -105,14 +119,7 @@
             });
         };
     } else {
-        try {
-            const local = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
-            if (local.bin) state.bin = parseDoc('bin', JSON.stringify(local.bin));
-            if (local.zin) state.zin = parseDoc('zin', JSON.stringify(local.zin));
-        } catch { }
-        savePersonGym = async () => {
-            localStorage.setItem(LOCAL_KEY, JSON.stringify(state));
-        };
+        savePersonGym = async () => saveLocalCache();
     }
 
     // ---------- 1. Tính chuỗi ngày tập (Streak) & Điểm danh 7 ngày trong tuần ----------
@@ -317,11 +324,11 @@
         $('goal-empty').hidden = goals.length > 0;
     }
 
-    // ---------- 3. Lịch tập trong tuần (Weekly Split CRUD) ----------
+    // ---------- 3. Lịch tập trong tuần (Buổi 1 - Buổi 5 CRUD) ----------
     function setSchEditing(item) {
         if (item) {
             editSchId = item.id;
-            $('sch-day').value = item.day;
+            $('sch-day').value = normalizeSession(item.day);
             $('sch-focus').value = item.focus;
             $('sch-note').value = item.note || '';
             $('sch-submit').textContent = 'Lưu';
@@ -329,7 +336,7 @@
             $('sch-focus').focus();
         } else {
             editSchId = null;
-            $('sch-day').value = 'T2';
+            $('sch-day').value = '1';
             $('sch-focus').value = '';
             $('sch-note').value = '';
             $('sch-submit').textContent = 'Thêm';
@@ -340,7 +347,7 @@
 
     $('schedule-form').addEventListener('submit', async e => {
         e.preventDefault();
-        const day = $('sch-day').value;
+        const day = normalizeSession($('sch-day').value);
         const focus = $('sch-focus').value.trim();
         const note = $('sch-note').value.trim();
         if (!focus) return;
@@ -351,7 +358,7 @@
         } else {
             schedule.push({ id: 's' + Date.now(), day, focus, note });
         }
-        schedule.sort((a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day));
+        schedule.sort((a, b) => SESSION_ORDER.indexOf(normalizeSession(a.day)) - SESSION_ORDER.indexOf(normalizeSession(b.day)));
         setSchEditing(null);
         renderSchedule();
         await savePersonGym(activePerson);
@@ -360,24 +367,23 @@
 
     function renderSchedule() {
         const schedule = state[activePerson].schedule;
-        schedule.sort((a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day));
-        const todayCode = DAY_ORDER[(new Date().getDay() + 6) % 7];
+        schedule.sort((a, b) => SESSION_ORDER.indexOf(normalizeSession(a.day)) - SESSION_ORDER.indexOf(normalizeSession(b.day)));
         const ul = $('schedule-list');
         ul.replaceChildren();
         schedule.forEach(s => {
             const li = document.createElement('li');
-            const isToday = s.day === todayCode;
-            li.className = 'milestone-item' + (isToday ? ' gym-today-row' : '');
+            li.className = 'milestone-item';
+            const sessionKey = normalizeSession(s.day);
 
             const dayBadge = document.createElement('span');
             dayBadge.className = 'milestone-badge';
-            dayBadge.textContent = DAY_LABELS[s.day] || s.day;
+            dayBadge.textContent = SESSION_LABELS[sessionKey] || 'Buổi 1';
 
             const info = document.createElement('div');
             info.className = 'min-w-0 flex-1';
             const t = document.createElement('p');
             t.className = 'font-bold text-[#713d53]';
-            t.textContent = s.focus + (isToday ? ' (Hôm nay)' : '');
+            t.textContent = s.focus;
             info.append(t);
             if (s.note) {
                 const sub = document.createElement('p');

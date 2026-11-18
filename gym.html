@@ -6,11 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Góc Tập Gym 💪 | Bin Zin</title>
     <link rel="icon" type="image/svg+xml" href="assets/icons/love_heart_icon.svg">
-    <link rel="stylesheet" href="styles.css?v=12">
+    <link rel="stylesheet" href="styles.css?v=13">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
 </head>
 
 <body class="w-full">
@@ -112,17 +111,15 @@
                     <!-- 3. Lịch tập trong tuần (Weekly Split CRUD) -->
                     <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col min-w-0 overflow-hidden">
                         <h2 class="text-[#713d53]">📋 Lịch tập trong tuần</h2>
-                        <p class="mt-1 text-sm text-[#876777]">Thêm, sửa, xóa các buổi tập từ Thứ 2 đến Chủ Nhật</p>
+                        <p class="mt-1 text-sm text-[#876777]">Thêm, sửa, xóa các buổi tập (Buổi 1 – Buổi 5)</p>
                         <form id="schedule-form" class="mt-4 flex flex-col gap-2.5">
                             <div class="grid grid-cols-[110px_1fr] gap-2">
-                                <select id="sch-day" class="field font-semibold" required aria-label="Thứ trong tuần">
-                                    <option value="T2">Thứ 2</option>
-                                    <option value="T3">Thứ 3</option>
-                                    <option value="T4">Thứ 4</option>
-                                    <option value="T5">Thứ 5</option>
-                                    <option value="T6">Thứ 6</option>
-                                    <option value="T7">Thứ 7</option>
-                                    <option value="CN">Chủ Nhật</option>
+                                <select id="sch-day" class="field font-semibold" required aria-label="Chọn buổi tập">
+                                    <option value="1">Buổi 1</option>
+                                    <option value="2">Buổi 2</option>
+                                    <option value="3">Buổi 3</option>
+                                    <option value="4">Buổi 4</option>
+                                    <option value="5">Buổi 5</option>
                                 </select>
                                 <input id="sch-focus" class="field" maxlength="60" placeholder="Nhóm cơ / Buổi tập (VD: Thân trên, Chân Mông)…" required>
                             </div>
@@ -190,8 +187,11 @@
             <p class="text-[#936c7c]">Made with ♡ for Bin &amp; Zin</p>
         </footer>
     </div>
-    <script src="nav.js?v=6"></script>
-    <script src="gym.js?v=1"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="nav.js?v=7"></script>
+    <script src="gym.js?v=2"></script>
 </body>
 
 </html>

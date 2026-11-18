@@ -22,7 +22,7 @@ const fmtTime = d => d ? d.toLocaleString('vi-VN', { hour: '2-digit', minute: '2
 function render(messages) {
     lastMessages = messages;
     const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
-    list.replaceChildren();
+    const frag = document.createDocumentFragment();
     messages.forEach(m => {
         const mine = m.name.trim().toLocaleLowerCase('vi-VN') === myName();
         const li = document.createElement('li');
@@ -37,24 +37,33 @@ function render(messages) {
         meta.append(who, ' · ', time);
         const title = document.createElement('h3'); title.className = 'chat-title'; title.textContent = m.title;
         const body = document.createElement('p'); body.className = 'chat-content'; body.textContent = m.content;
-        bubble.append(meta, title, body); li.append(bubble); list.append(li);
+        bubble.append(meta, title, body); li.append(bubble); frag.append(li);
     });
+    list.replaceChildren(frag);
     empty.hidden = messages.length > 0;
     if (nearBottom || render.first !== false) { list.scrollTop = list.scrollHeight; render.first = false }
 }
 
-// ---------- Lưu trữ ----------
+// ---------- Lưu trữ + Cache tức thì ----------
 let sendMessage;
+try {
+    const cached = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+    if (cached.length) render(cached.map(m => ({ ...m, createdAt: m.createdAt ? new Date(m.createdAt) : null })));
+} catch { }
 
 if (firebaseReady) {
     const col = firebase.firestore().collection('messages');
-    statusEl.textContent = 'Đang tải lời nhắn…';
-    col.orderBy('createdAt', 'asc').limit(500).onSnapshot(snap => {
+    if (!lastMessages.length) statusEl.textContent = 'Đang tải lời nhắn…';
+    col.orderBy('createdAt', 'desc').limit(150).onSnapshot(snap => {
         statusEl.textContent = '';
-        render(snap.docs.map(doc => {
+        const msgs = snap.docs.map(doc => {
             const d = doc.data({ serverTimestamps: 'estimate' });
             return { name: d.name || '', title: d.title || '', content: d.content || '', createdAt: d.createdAt ? d.createdAt.toDate() : null };
-        }));
+        }).reverse();
+        try {
+            localStorage.setItem(LOCAL_KEY, JSON.stringify(msgs.slice(-60).map(m => ({ ...m, createdAt: m.createdAt ? m.createdAt.toISOString() : null }))));
+        } catch { }
+        render(msgs);
     }, err => { console.error(err); statusEl.textContent = 'Không tải được lời nhắn (kiểm tra cấu hình/luật Firestore).' });
     sendMessage = m => col.add({ ...m, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
 } else {

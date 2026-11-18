@@ -94,7 +94,11 @@ const $ = id => document.getElementById(id);
 
     const cfg = window.FIREBASE_CONFIG || {};
     const firebaseReady = Boolean(window.firebase && cfg.apiKey && !String(cfg.apiKey).startsWith('YOUR_'));
-    if (firebaseReady && !firebase.apps.length) firebase.initializeApp(cfg);
+    if (firebaseReady && !firebase.apps.length) {
+        firebase.initializeApp(cfg);
+        // Bật cache IndexedDB của Firestore để chuyển trang hiển thị ngay từ bộ nhớ cục bộ
+        try { firebase.firestore().enablePersistence({ synchronizeTabs: true }).catch(() => { }) } catch { }
+    }
 
     // Quản lý document dùng chung profiles/mood (lưu Mood ở Home, Cột mốc ở Calendar, Danh sách ở Wheel)
     const STATE_KEY = 'binzin-mood-v1';
@@ -258,14 +262,14 @@ const $ = id => document.getElementById(id);
         petalHost.className = 'petal-layer';
         petalHost.setAttribute('aria-hidden', 'true');
         const symbols = ['🌸', '💗', '🌷', '✨', '💕', '💮'];
-        for (let i = 0; i < 14; i++) {
+        for (let i = 0; i < 7; i++) {
             const s = document.createElement('span');
             s.className = 'floating-petal';
             s.textContent = symbols[i % symbols.length];
-            s.style.left = `${(i * 7.3 + Math.random() * 5) % 100}%`;
-            s.style.animationDuration = `${13 + Math.random() * 12}s`;
-            s.style.animationDelay = `${-Math.random() * 20}s`;
-            s.style.fontSize = `${12 + Math.random() * 10}px`;
+            s.style.left = `${(i * 14.2 + Math.random() * 6) % 100}%`;
+            s.style.animationDuration = `${14 + Math.random() * 10}s`;
+            s.style.animationDelay = `${-Math.random() * 18}s`;
+            s.style.fontSize = `${13 + Math.random() * 8}px`;
             petalHost.append(s);
         }
         document.body.append(petalHost);
