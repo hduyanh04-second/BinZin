@@ -48,10 +48,10 @@ service cloud.firestore {
       allow delete: if true;
     }
 
-    // ===== Profile, Ảnh bìa Home & Trạng thái/Cột mốc/Vòng quay =====
+    // ===== Profile, Ảnh bìa Home, Trạng thái/Cột mốc/Vòng quay & Sổ Tập Gym =====
     match /profiles/{person} {
       allow read: if true;
-      allow create, update: if person in ['bin', 'zin', 'home', 'mood']
+      allow create, update: if person in ['bin', 'zin', 'home', 'mood', 'gym-bin', 'gym-zin']
         && request.resource.data.keys().hasOnly(['name', 'bio', 'about', 'likes', 'photo', 'updatedAt'])
         && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
         && request.resource.data.bio is string && request.resource.data.bio.size() <= 160

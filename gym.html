@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Góc Tập Gym 💪 | Bin Zin</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/love_heart_icon.svg">
+    <link rel="stylesheet" href="styles.css?v=12">
+    <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+
+<body class="w-full">
+    <div class="app-wrapper min-h-screen flex flex-col">
+        <header class="border-b border-white/70 bg-white/50">
+            <div class="mx-auto max-w-6xl px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+                <a href="index.html" class="canva-button font-bold text-[#c85578]">BinZin World 💕</a>
+                <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Mở menu"
+                    aria-controls="main-nav" aria-expanded="false">
+                    <span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>
+                </button>
+                <nav id="main-nav" aria-label="Điều hướng chính" class="main-nav"></nav>
+            </div>
+        </header>
+
+        <main class="mx-auto w-full max-w-6xl px-4 sm:px-5 py-8 md:py-12 flex-1">
+            <section class="reveal" aria-labelledby="gym-title">
+                <h1 id="gym-title" class="text-center text-[#713d53]">Góc Tập Gym của Bin &amp; Zin 💪</h1>
+                <p class="mt-2 text-center text-[#876777]">Cùng nhau khỏe đẹp mỗi ngày — điểm danh, giữ chuỗi và lưu lại kỷ lục của hai đứa nha ♡</p>
+                <p id="gym-status" role="status" aria-live="polite" class="mt-2 text-center text-sm text-[#a84268]"></p>
+
+                <!-- 1. Chuỗi ngày đi tập & Điểm danh mỗi ngày (hiển thị song song Bin & Zin) -->
+                <div class="mt-8 grid md:grid-cols-2 gap-6">
+                    <!-- Thẻ điểm danh Bin -->
+                    <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-2">
+                                <h2 class="text-[#713d53]">🐻 Bin</h2>
+                                <span id="streak-bin" class="gym-streak-badge">🔥 0 ngày liên tiếp</span>
+                            </div>
+                            <p id="week-progress-bin" class="mt-1 text-sm text-[#876777]">Tuần này: 0/4 buổi</p>
+                            <div class="gym-progress-track mt-2">
+                                <div id="week-bar-bin" class="gym-progress-fill" style="width:0%"></div>
+                            </div>
+                            <div id="week-dots-bin" class="gym-week-dots mt-4" aria-label="7 ngày trong tuần của Bin"></div>
+                        </div>
+                        <button type="button" id="checkin-btn-bin" class="primary mt-5 w-full">💪 Điểm danh hôm nay</button>
+                    </div>
+
+                    <!-- Thẻ điểm danh Zin -->
+                    <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-2">
+                                <h2 class="text-[#713d53]">🌷 Zin</h2>
+                                <span id="streak-zin" class="gym-streak-badge">🔥 0 ngày liên tiếp</span>
+                            </div>
+                            <p id="week-progress-zin" class="mt-1 text-sm text-[#876777]">Tuần này: 0/4 buổi</p>
+                            <div class="gym-progress-track mt-2">
+                                <div id="week-bar-zin" class="gym-progress-fill" style="width:0%"></div>
+                            </div>
+                            <div id="week-dots-zin" class="gym-week-dots mt-4" aria-label="7 ngày trong tuần của Zin"></div>
+                        </div>
+                        <button type="button" id="checkin-btn-zin" class="primary mt-5 w-full">💪 Điểm danh hôm nay</button>
+                    </div>
+                </div>
+
+                <!-- Chuyển hồ sơ chi tiết: Bin / Zin -->
+                <div class="mt-10 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex gap-2" role="tablist" aria-label="Chọn người tập">
+                        <button type="button" role="tab" data-gym-person="bin" aria-selected="true" class="primary">🐻 Sổ tập của Bin</button>
+                        <button type="button" role="tab" data-gym-person="zin" aria-selected="false" class="secondary">🌷 Sổ tập của Zin</button>
+                    </div>
+                    <span id="active-person-label" class="text-sm font-semibold text-[#a84268]">Đang xem: 🐻 Bin</span>
+                </div>
+
+                <!-- 2. Mục tiêu & 3. Lịch tập trong tuần (CRUD) -->
+                <div class="mt-6 grid lg:grid-cols-2 gap-6">
+                    <!-- 2. Mục tiêu (Goals CRUD) -->
+                    <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col min-w-0 overflow-hidden">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h2 class="text-[#713d53]">🎯 Mục tiêu tập luyện</h2>
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <label for="weekly-target-select" class="text-[#876777]">Mục tiêu tuần:</label>
+                                <select id="weekly-target-select" class="field !w-auto !py-1 !px-2.5 text-sm font-bold">
+                                    <option value="2">2 buổi</option>
+                                    <option value="3">3 buổi</option>
+                                    <option value="4" selected>4 buổi</option>
+                                    <option value="5">5 buổi</option>
+                                    <option value="6">6 buổi</option>
+                                    <option value="7">7 buổi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p class="mt-1 text-sm text-[#876777]">Đặt mục tiêu cân nặng, số đo, thói quen hoặc kèo thưởng/phạt cùng nhau 💕</p>
+                        <form id="goal-form" class="mt-4 flex flex-col gap-2.5">
+                            <input id="goal-title" class="field" maxlength="80" placeholder="VD: Giảm 3kg / Tập đủ 16 buổi tháng này…" required>
+                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+                                <input id="goal-target" class="field" maxlength="60" placeholder="Chỉ số / Phần thưởng (VD: 52kg hoặc Trà sữa)…">
+                                <div class="flex gap-1.5">
+                                    <button type="submit" id="goal-submit" class="primary flex-1 sm:flex-none">Thêm</button>
+                                    <button type="button" id="goal-cancel" class="secondary" hidden>Hủy</button>
+                                </div>
+                            </div>
+                        </form>
+                        <ul id="goal-list" class="mt-5 space-y-2.5 flex-1"></ul>
+                        <p id="goal-empty" class="text-center text-sm text-[#876777] py-6" hidden>Chưa có mục tiêu nào. Thêm mục tiêu đầu tiên nha ♡</p>
+                    </div>
+
+                    <!-- 3. Lịch tập trong tuần (Weekly Split CRUD) -->
+                    <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col min-w-0 overflow-hidden">
+                        <h2 class="text-[#713d53]">📋 Lịch tập trong tuần</h2>
+                        <p class="mt-1 text-sm text-[#876777]">Thêm, sửa, xóa các buổi tập từ Thứ 2 đến Chủ Nhật</p>
+                        <form id="schedule-form" class="mt-4 flex flex-col gap-2.5">
+                            <div class="grid grid-cols-[110px_1fr] gap-2">
+                                <select id="sch-day" class="field font-semibold" required aria-label="Thứ trong tuần">
+                                    <option value="T2">Thứ 2</option>
+                                    <option value="T3">Thứ 3</option>
+                                    <option value="T4">Thứ 4</option>
+                                    <option value="T5">Thứ 5</option>
+                                    <option value="T6">Thứ 6</option>
+                                    <option value="T7">Thứ 7</option>
+                                    <option value="CN">Chủ Nhật</option>
+                                </select>
+                                <input id="sch-focus" class="field" maxlength="60" placeholder="Nhóm cơ / Buổi tập (VD: Thân trên, Chân Mông)…" required>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+                                <input id="sch-note" class="field" maxlength="100" placeholder="Chi tiết bài tập / ghi chú (không bắt buộc)…">
+                                <div class="flex gap-1.5">
+                                    <button type="submit" id="sch-submit" class="primary flex-1 sm:flex-none">Thêm</button>
+                                    <button type="button" id="sch-cancel" class="secondary" hidden>Hủy</button>
+                                </div>
+                            </div>
+                        </form>
+                        <ul id="schedule-list" class="mt-5 space-y-2.5 flex-1"></ul>
+                        <p id="schedule-empty" class="text-center text-sm text-[#876777] py-6" hidden>Chưa có lịch tập trong tuần. Thêm buổi tập ở trên nha 💪</p>
+                    </div>
+                </div>
+
+                <!-- 4. Nhật ký bài tập & Kỷ lục cá nhân (Workout Log & PRs CRUD) -->
+                <div class="mt-6 grid lg:grid-cols-2 gap-6">
+                    <!-- Kỷ lục cá nhân (Personal Records CRUD) -->
+                    <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col min-w-0 overflow-hidden">
+                        <h2 class="text-[#713d53]">🏆 Kỷ lục cá nhân (PRs)</h2>
+                        <p class="mt-1 text-sm text-[#876777]">Lưu lại mức tạ, số lần hoặc thời gian tốt nhất của từng bài tập</p>
+                        <form id="pr-form" class="mt-4 flex flex-col gap-2.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <input id="pr-exercise" class="field" maxlength="60" placeholder="Tên bài (VD: Squat, Plank)…" required>
+                                <input id="pr-record" class="field" maxlength="50" placeholder="Kỷ lục (VD: 80kg x 5, 3 phút)…" required>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+                                <input id="pr-date" type="date" class="field" required>
+                                <div class="flex gap-1.5">
+                                    <button type="submit" id="pr-submit" class="primary flex-1 sm:flex-none">Thêm</button>
+                                    <button type="button" id="pr-cancel" class="secondary" hidden>Hủy</button>
+                                </div>
+                            </div>
+                        </form>
+                        <ul id="pr-list" class="mt-5 space-y-2.5 flex-1"></ul>
+                        <p id="pr-empty" class="text-center text-sm text-[#876777] py-6" hidden>Chưa có kỷ lục nào được ghi lại. Hãy thêm PR đầu tiên nha 🏆</p>
+                    </div>
+
+                    <!-- Nhật ký bài tập (Workout Logs CRUD) -->
+                    <div class="glass rounded-[30px] p-5 sm:p-7 flex flex-col min-w-0 overflow-hidden">
+                        <h2 class="text-[#713d53]">📓 Nhật ký bài tập</h2>
+                        <p class="mt-1 text-sm text-[#876777]">Ghi lại các bài đã tập từng ngày (Số hiệp × Số lần × Mức tạ)</p>
+                        <form id="log-form" class="mt-4 flex flex-col gap-2.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <input id="log-exercise" class="field" maxlength="60" placeholder="Bài tập (VD: Bench Press, Chạy bộ)…" required>
+                                <input id="log-detail" class="field" maxlength="80" placeholder="Chi tiết (VD: 4 hiệp x 10 lần - 50kg)…" required>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+                                <input id="log-date" type="date" class="field" required>
+                                <div class="flex gap-1.5">
+                                    <button type="submit" id="log-submit" class="primary flex-1 sm:flex-none">Ghi nhật ký</button>
+                                    <button type="button" id="log-cancel" class="secondary" hidden>Hủy</button>
+                                </div>
+                            </div>
+                        </form>
+                        <ul id="log-list" class="mt-5 space-y-2.5 flex-1 max-h-96 overflow-y-auto pr-1"></ul>
+                        <p id="log-empty" class="text-center text-sm text-[#876777] py-6" hidden>Chưa có nhật ký buổi tập nào. Tập xong nhớ ghi lại nha 💪</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="px-5 py-8 text-center">
+            <p class="text-[#936c7c]">Made with ♡ for Bin &amp; Zin</p>
+        </footer>
+    </div>
+    <script src="nav.js?v=6"></script>
+    <script src="gym.js?v=1"></script>
+</body>
+
+</html>

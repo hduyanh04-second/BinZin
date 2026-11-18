@@ -893,6 +893,84 @@ input[type="date"].field {
     }
 }
 
+/* ===== Trang Tập Gym (gym.html) ===== */
+.gym-streak-badge {
+    padding: .35rem .85rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #ffe7ed, #fbdce5);
+    color: #c85578;
+    font-size: .85rem;
+    font-weight: 800
+}
+
+.gym-progress-track {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: #ffe7ed;
+    overflow: hidden
+}
+
+.gym-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #e0789a, #c85578);
+    transition: width .3s
+}
+
+.gym-week-dots {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: .35rem
+}
+
+.gym-day-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: .45rem .15rem;
+    border-radius: 14px;
+    background: #fffafb;
+    border: 1px solid var(--line);
+    color: var(--ink)
+}
+
+.gym-day-dot.today {
+    box-shadow: inset 0 0 0 2px var(--rose)
+}
+
+.gym-day-dot.checked {
+    background: var(--rose);
+    border-color: var(--rose);
+    color: #fff
+}
+
+.gym-check-circle {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid #c85578;
+    background: #fff;
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+    padding: 0
+}
+
+.gym-check-circle.done {
+    background: #c85578
+}
+
+.gym-today-row {
+    background: #ffe7ed;
+    border-color: #f3b6c8
+}
+
 /* ===== Thanh điều hướng ===== */
 .app-wrapper>header {
     position: sticky;

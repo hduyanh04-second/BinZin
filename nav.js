@@ -10,6 +10,7 @@ const $ = id => document.getElementById(id);
         { href: 'calendar.html', label: 'Ngày mấy iu nhau 🧐' },
         { href: 'photos.html', label: 'Photographs' },
         { href: 'wheel.html', label: 'Hôm nay ăn gì 🎡' },
+        { href: 'gym.html', label: 'Tập Gym 💪' },
         { href: 'games.html', label: 'Game' }
     ];
     const currentFile = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
